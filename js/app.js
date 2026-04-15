@@ -172,15 +172,20 @@
         if (key === seq[idx]) { idx++; if (idx === seq.length) { idx = 0; self.openDebugMenu(); } }
         else { idx = (key === seq[0]) ? 1 : 0; }
       });
-      // モバイル用: ヘッダーロゴを 5 回連タップで開く
+      // モバイル用: ヘッダーロゴを 5 回連タップで開く(touchend で 300ms 遅延を回避)
       let tapCount = 0, tapTimer = null;
       const logo = document.querySelector('.app-header__logo');
-      if (logo) logo.addEventListener('click', function () {
-        tapCount++;
-        if (tapTimer) clearTimeout(tapTimer);
-        tapTimer = setTimeout(function () { tapCount = 0; }, 1500);
-        if (tapCount >= 5) { tapCount = 0; self.openDebugMenu(); }
-      });
+      if (logo) {
+        function _onLogoTap(e) {
+          if (e.type === 'touchend') e.preventDefault();
+          tapCount++;
+          if (tapTimer) clearTimeout(tapTimer);
+          tapTimer = setTimeout(function () { tapCount = 0; }, 1500);
+          if (tapCount >= 5) { tapCount = 0; self.openDebugMenu(); }
+        }
+        logo.addEventListener('touchend', _onLogoTap, { passive: false });
+        logo.addEventListener('click',    _onLogoTap);
+      }
     },
 
     /* ======================================================================

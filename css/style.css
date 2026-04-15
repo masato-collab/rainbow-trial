@@ -119,11 +119,11 @@
 html, body { height: 100%; }
 html {
   -webkit-text-size-adjust: 100%;
-  overflow-x: hidden; /* 横スクロール防止: fixed要素のズレを防ぐ */
+  /* overflow-x: hidden を html に設定すると iOS Safari で
+     position:fixed オーバーレイが壊れるため設定しない */
 }
 
 body {
-  overflow-x: hidden; /* 横スクロール防止 */
   margin: 0;
   background: var(--bg-primary);
   color: var(--text-primary);
@@ -302,6 +302,7 @@ input, textarea, select, button { font: inherit; color: inherit; }
   max-width: var(--max-w);
   margin: 0 auto;
   padding: var(--sp-4) var(--sp-4) var(--sp-6);
+  overflow-x: hidden; /* コンテンツ層で横スクロールを防止(html/bodyには設定しない) */
 }
 
 /* タブバー(下部固定) */
