@@ -333,7 +333,8 @@
         this._drawHLine(ctx, plot, range, this.signal.entry, COLORS.entry, 'Entry');
       }
 
-      // MA(80 → 20 の順で 20 が前面)
+      // レインボーロード: ライン間グラデーション塗り → MA80 → MA20 の順
+      this._drawRainbowRoadFill(ctx, plot, range);
       this._drawMA(ctx, plot, range, this.signal.ma80, COLORS.ma80);
       this._drawMA(ctx, plot, range, this.signal.ma20, COLORS.ma20);
 
@@ -434,6 +435,47 @@
         ctx.textAlign = 'left';
         ctx.fillText(text, x + padX, y);
       }
+    }
+
+    _drawRainbowRoadFill(ctx, plot, range) {
+      const ma20 = this.signal.ma20;
+      const ma80 = this.signal.ma80;
+      if (!ma20 || !ma80) return;
+
+      const endIdx = Math.min(this.viewEnd, this.baseTotal - 1);
+      const pts20 = [];
+      const pts80 = [];
+      for (let i = this.viewStart; i <= endIdx; i++) {
+        const v20 = ma20[i];
+        const v80 = ma80[i];
+        if (v20 == null || v80 == null) continue;
+        const x = this._xForIndex(i, plot);
+        pts20.push({ x, y: this._yForPrice(v20, plot, range) });
+        pts80.push({ x, y: this._yForPrice(v80, plot, range) });
+      }
+      if (pts20.length < 2) return;
+
+      // 水平方向の虹グラデーション(透明度 13%)
+      const grad = ctx.createLinearGradient(plot.x, 0, plot.x + plot.w, 0);
+      grad.addColorStop(0.00, 'rgba(255,  80,  80, 0.13)');  // 赤
+      grad.addColorStop(0.17, 'rgba(255, 160,  40, 0.13)');  // オレンジ
+      grad.addColorStop(0.33, 'rgba(255, 220,  60, 0.13)');  // 黄
+      grad.addColorStop(0.50, 'rgba( 60, 220,  80, 0.13)');  // 緑
+      grad.addColorStop(0.67, 'rgba( 40, 182, 255, 0.13)');  // 青
+      grad.addColorStop(0.83, 'rgba(130,  80, 255, 0.13)');  // 藍
+      grad.addColorStop(1.00, 'rgba(220,  80, 255, 0.13)');  // 紫
+
+      ctx.save();
+      ctx.beginPath();
+      // MA20 を左→右でトレース
+      ctx.moveTo(pts20[0].x, pts20[0].y);
+      for (let i = 1; i < pts20.length; i++) ctx.lineTo(pts20[i].x, pts20[i].y);
+      // MA80 を右→左でトレース(閉じるため)
+      for (let i = pts80.length - 1; i >= 0; i--) ctx.lineTo(pts80[i].x, pts80[i].y);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.restore();
     }
 
     _drawMA(ctx, plot, range, arr, color) {
