@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#0F1419">
   <meta name="description" content="Rainbow System を、7日間体験。実際のサロンで配信されるトレードシグナルを疑似体験できるトレーニングアプリ。">
   <meta name="format-detection" content="telephone=no">
@@ -146,7 +146,7 @@
         </div>
 
         <!-- PWA インストール推奨 -->
-        <div class="install-section" id="welcome-install-section">
+        <div class="install-section" id="welcome-install-section" data-install-ui>
           <div class="install-section-header">
             <h3>📱 アプリとして使いますか?</h3>
           </div>
@@ -164,10 +164,12 @@
               <span>オフラインでも使える</span>
             </div>
           </div>
-          <button class="install-button-primary" id="welcome-install-btn" type="button">
+          <button class="install-button-primary" id="welcome-install-btn" data-install-btn type="button"
+                  onclick="if(window.InstallHandler) InstallHandler.install();">
             📲 ホーム画面に追加する
           </button>
-          <button class="install-skip-btn" id="welcome-skip-install" type="button">
+          <button class="install-skip-btn" type="button"
+                  onclick="document.getElementById('welcome-install-section').style.display='none'">
             後で設定する
           </button>
         </div>
@@ -233,7 +235,8 @@
     </div>
   </div>
 
-  <!-- 依存: localStorage のみ触るので、storage.js だけで足りる -->
+  <!-- 依存スクリプト: 読み込み順に注意 -->
+  <script src="js/device-detect.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/install-detector.js"></script>
   <script src="js/install-handler.js"></script>
@@ -260,27 +263,8 @@
       const testMode = false;
 
       // --- インストールセクション制御 ---------------------------------------
-      const installSection = document.getElementById('welcome-install-section');
-      // インストール済みなら非表示
-      if (window.InstallDetector && window.InstallDetector.isInstalled()) {
-        if (installSection) installSection.style.display = 'none';
-      }
-      // InstallHandler 初期化(beforeinstallprompt キャプチャ)
+      // InstallHandler.init() がインストール済み判定 + UI 非表示を行う
       if (window.InstallHandler) window.InstallHandler.init();
-      // 「ホーム画面に追加する」ボタン
-      const installBtn = document.getElementById('welcome-install-btn');
-      if (installBtn) {
-        installBtn.addEventListener('click', function () {
-          if (window.InstallHandler) window.InstallHandler.install();
-        });
-      }
-      // 「後で設定する」ボタン
-      const skipInstallBtn = document.getElementById('welcome-skip-install');
-      if (skipInstallBtn) {
-        skipInstallBtn.addEventListener('click', function () {
-          if (installSection) installSection.style.display = 'none';
-        });
-      }
 
       // --- 規約モーダル -----------------------------------------------------
       const termsOverlay = document.getElementById('terms-overlay');

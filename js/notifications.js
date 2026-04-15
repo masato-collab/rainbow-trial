@@ -434,6 +434,48 @@
    * Level 3 — Web Notification API (Phase 2)
    * -------------------------------------------------------------------------- */
 
+  /** iOS でインストール前に通知を要求した場合に表示するメッセージ */
+  function _showIOSInstallFirstMessage() {
+    var existing = document.getElementById('ios-notify-modal');
+    if (existing) return;
+    var overlay = document.createElement('div');
+    overlay.id = 'ios-notify-modal';
+    overlay.style.cssText = [
+      'position:fixed', 'inset:0', 'background:rgba(0,0,0,0.75)',
+      'display:flex', 'align-items:center', 'justify-content:center',
+      'z-index:9999', 'padding:16px'
+    ].join(';');
+    overlay.innerHTML =
+      '<div style="background:#1A1F2E;border-radius:20px;padding:24px;max-width:360px;width:100%;color:#F5F7FA;text-align:center;">' +
+        '<div style="font-size:48px;margin-bottom:12px;">🔔</div>' +
+        '<h2 style="font-size:1.1rem;margin:0 0 12px;">通知を受け取るには</h2>' +
+        '<p style="color:#A8B2C7;font-size:0.9rem;line-height:1.7;margin:0 0 20px;">' +
+          'iPhone では<strong style="color:#F5F7FA;">ホーム画面に追加</strong>してから<br>通知を有効にできます。' +
+        '</p>' +
+        '<button id="ios-notify-install" style="width:100%;padding:14px;border-radius:12px;border:none;' +
+          'background:linear-gradient(135deg,#9775FA,#4DABF7);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:8px;">' +
+          '📲 ホーム画面に追加する' +
+        '</button>' +
+        '<button id="ios-notify-close" style="width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);' +
+          'background:transparent;color:#A8B2C7;font-size:0.9rem;cursor:pointer;">' +
+          '後で' +
+        '</button>' +
+      '</div>';
+    document.body.appendChild(overlay);
+    var closeBtn = overlay.querySelector('#ios-notify-close');
+    if (closeBtn) closeBtn.addEventListener('click', function () {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    });
+    var installBtn = overlay.querySelector('#ios-notify-install');
+    if (installBtn) installBtn.addEventListener('click', function () {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      if (global.InstallHandler) global.InstallHandler.install();
+    });
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    });
+  }
+
   // レアリティ別の通知挙動デフォルト
   const RARITY_BEHAVIOR = {
     normal:    { browserNotify: false, vibrate: null,           requireInteraction: false },
@@ -470,6 +512,20 @@
   }
 
   async function requestPermission() {
+    // iOS 対応: インストール前は通知を要求できない
+    if (typeof global.DeviceDetect !== 'undefined' && global.DeviceDetect.isIOS()) {
+      const iosVer = global.DeviceDetect.getIOSVersion();
+      if (iosVer !== null && iosVer < 16) {
+        console.log('[Notifications] iOS ' + iosVer + ' は通知未対応');
+        return 'unsupported';
+      }
+      if (!global.DeviceDetect.isStandalone()) {
+        // iOS 16.4+ でも PWA(ホーム画面追加後)でないと通知不可
+        _showIOSInstallFirstMessage();
+        return 'needs-install';
+      }
+    }
+
     if (typeof Notification === 'undefined') return 'unsupported';
     if (Notification.permission !== 'default') return Notification.permission;
     try {

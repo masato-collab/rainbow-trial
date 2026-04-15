@@ -603,5 +603,195 @@
  * -------------------------------------------------------------------------- */
 @media (display-mode: standalone) {
   #install-banner,
-  .install-section { display: none !important; }
+  .install-section,
+  [data-install-ui] { display: none !important; }
+}
+
+/* --------------------------------------------------------------------------
+ * 10. 統合インストールモーダル (install-handler.js が使用)
+ * -------------------------------------------------------------------------- */
+.install-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: calc(16px + env(safe-area-inset-top, 0px)) 16px
+           calc(16px + env(safe-area-inset-bottom, 0px));
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+.install-modal-overlay.is-open { opacity: 1; }
+
+.install-modal {
+  background: var(--bg-secondary, #1A1F2E);
+  border-radius: 20px;
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  color: var(--text-primary, #F5F7FA);
+}
+
+.install-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #6B7588);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  line-height: 1;
+  -webkit-appearance: none;
+}
+.install-modal__close:active { opacity: 0.6; }
+
+.install-modal__title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 32px 6px 0;
+  color: var(--text-primary, #F5F7FA);
+}
+
+.install-modal__sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #A8B2C7);
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.install-modal__note {
+  font-size: 0.78rem;
+  color: var(--text-muted, #6B7588);
+  text-align: center;
+  margin: 12px 0 0;
+  line-height: 1.5;
+}
+
+/* iOS ステップ */
+.ios-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.ios-step__num {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9775FA, #4DABF7);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.ios-step__body {
+  flex: 1;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #A8B2C7);
+}
+.ios-step__body p { margin: 0 0 8px; }
+.ios-step__body strong { color: var(--text-primary, #F5F7FA); }
+
+.ios-step__hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #6B7588);
+}
+
+.ios-step__menu-mock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  color: var(--text-primary, #F5F7FA);
+  font-weight: 600;
+}
+.ios-step__menu-icon { font-size: 1.1rem; }
+
+/* Android/PC ステップリスト */
+.install-modal__steps {
+  padding-left: 20px;
+  margin: 0 0 16px;
+  color: var(--text-secondary, #A8B2C7);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+.install-modal__steps strong { color: var(--text-primary, #F5F7FA); }
+
+/* 完了ボタン */
+.install-modal__done {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #06C755, #4CAF50);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 16px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  touch-action: manipulation;
+}
+.install-modal__done:active { opacity: 0.85; }
+
+/* 成功モーダル */
+.install-modal--success { text-align: center; }
+.install-modal__success-icon { font-size: 56px; margin: 8px 0 16px; }
+
+.install-modal__benefits {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  text-align: left;
+}
+.install-modal__benefits li {
+  padding: 6px 0;
+  color: var(--text-secondary, #A8B2C7);
+  font-size: 0.9rem;
+}
+
+/* iPhone X 以降の @supports safe-area 対応 */
+@supports (padding: max(0px)) {
+  .install-modal-overlay {
+    padding-top:    max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+/* welcome 画面のインストールセクション: data-install-ui 属性対応 */
+[data-install-ui].install-section {
+  /* 既存 .install-section スタイルを継承 */
+}
+
+/* バナーの data-install-ui 属性対応 */
+[data-install-ui]#install-banner {
+  /* 既存 #install-banner スタイルを継承 */
 }

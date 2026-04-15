@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <meta name="theme-color" content="#9775FA">
   <meta name="description" content="FXサロン「Rainbow Salon」の半裁量システム『Rainbow System』を7日間限定で体験。シグナル受信からチャート判定、トレードまでを疑似体験できます。完全無料、登録不要。">
   <meta name="keywords" content="FX,体験,シミュレーター,Rainbow,シグナル,半裁量,トレード">
@@ -169,13 +169,15 @@
        タブバー(下部固定、メイン画面のみ表示)
        ========================================================================== -->
   <!-- インストールバナー(タブバー上部固定) -->
-  <div id="install-banner" role="banner" aria-label="ホーム画面に追加">
+  <div id="install-banner" data-install-ui role="banner" aria-label="ホーム画面に追加">
     <div class="install-banner-content">
       <span class="install-banner-icon">📲</span>
-      <span class="install-banner-text">アプリとしてホーム画面に追加</span>
-      <button class="install-banner-action" type="button">追加方法</button>
+      <span class="install-banner-text" data-install-btn>アプリとしてホーム画面に追加</span>
+      <button class="install-banner-action" type="button"
+              onclick="if(window.InstallHandler) InstallHandler.install();">追加方法</button>
     </div>
-    <button class="install-banner-close" id="install-banner-close" type="button" aria-label="閉じる">×</button>
+    <button class="install-banner-close" id="install-banner-close" type="button" aria-label="閉じる"
+            onclick="event.stopPropagation(); this.closest('#install-banner').style.display='none'; localStorage.setItem('install-banner-dismissed', Date.now());">×</button>
   </div>
 
   <nav class="tabbar" id="tabbar" aria-label="メインナビゲーション">
@@ -246,9 +248,10 @@
        アプリ本体: 依存関係順に読み込み
        ========================================================================== -->
   <!-- データ層 -->
+  <script src="js/device-detect.js?v=20260416-ios1"></script>
   <script src="js/storage.js?v=20260416-p4"></script>
   <script src="js/install-detector.js?v=20260416-p7"></script>
-  <script src="js/install-handler.js?v=20260416-p7"></script>
+  <script src="js/install-handler.js?v=20260416-ios1"></script>
   <script src="js/install-modal.js?v=20260416-p7"></script>
   <script src="js/install-banner.js?v=20260416-p7"></script>
   <script src="data/scenarios.js?v=20260416-pwa"></script>
