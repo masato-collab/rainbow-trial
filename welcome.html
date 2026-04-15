@@ -134,23 +134,6 @@
           <div class="field__error" id="err-nickname"></div>
         </div>
 
-        <!-- テストモードスイッチ -->
-        <div
-          class="welcome__mode"
-          id="test-mode-toggle"
-          role="switch"
-          tabindex="0"
-          aria-checked="false"
-          aria-label="テストモード">
-          <div class="welcome__mode-text">
-            <div class="welcome__mode-title">⚙️ テストモード</div>
-            <div class="welcome__mode-desc">
-              ON にするとシグナルが <strong>1分間隔</strong> で配信されます(動作確認用)
-            </div>
-          </div>
-          <span class="toggle" aria-hidden="true"></span>
-        </div>
-
         <!-- 規約同意 -->
         <label class="check" id="field-agree">
           <input type="checkbox" id="agree" name="agree">
@@ -215,26 +198,12 @@
       const form       = document.getElementById('welcome-form');
       const nicknameEl = document.getElementById('nickname');
       const agreeEl    = document.getElementById('agree');
-      const modeEl     = document.getElementById('test-mode-toggle');
       const errName    = document.getElementById('err-nickname');
       const errAgree   = document.getElementById('err-agree');
       const loading    = document.getElementById('loading');
       const startBtn   = document.getElementById('start-btn');
 
-      // --- テストモードトグル -----------------------------------------------
-      let testMode = false;
-      function setTestMode(v) {
-        testMode = !!v;
-        modeEl.classList.toggle('is-active', testMode);
-        modeEl.setAttribute('aria-checked', testMode ? 'true' : 'false');
-      }
-      modeEl.addEventListener('click', function () { setTestMode(!testMode); });
-      modeEl.addEventListener('keydown', function (e) {
-        if (e.key === ' ' || e.key === 'Enter') {
-          e.preventDefault();
-          setTestMode(!testMode);
-        }
-      });
+      const testMode = false;
 
       // --- 規約モーダル -----------------------------------------------------
       const termsOverlay = document.getElementById('terms-overlay');

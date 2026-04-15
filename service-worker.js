@@ -14,7 +14,7 @@
  *   - CACHE_NAME を変更すると古いキャッシュを activate で一掃
  * ========================================================================== */
 
-const CACHE_VERSION = 'v5.0.0-20260416p5';
+const CACHE_VERSION = 'v5.0.1-20260416p6';
 const CACHE_NAME    = 'rainbow-trial-' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
