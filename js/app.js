@@ -793,6 +793,11 @@
       // Phase 3: プロフィールカード (レベル・XP・連勝)
       html += this._renderProfileCard(state);
 
+      // インストール促進セクション(プロフィール直下・未インストール時のみ)
+      if (global.HomeInstallSection) {
+        html += global.HomeInstallSection.renderHTML();
+      }
+
       // 資金カード
       html += this._renderCapitalCard(snap.account, stats);
 
@@ -1085,6 +1090,10 @@
       const achBtn = document.getElementById('btn-go-achievements');
       if (achBtn) {
         achBtn.addEventListener('click', function () { self.setTab('achievements'); });
+      }
+      // インストールセクションのイベントバインド
+      if (global.HomeInstallSection) {
+        global.HomeInstallSection.init();
       }
     },
 

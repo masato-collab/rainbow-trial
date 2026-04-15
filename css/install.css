@@ -599,6 +599,128 @@
 }
 
 /* --------------------------------------------------------------------------
+ * 11. ホーム画面インストール促進セクション
+ * -------------------------------------------------------------------------- */
+.home-install-section {
+  background: linear-gradient(135deg,
+    rgba(255,107,107,0.08), rgba(255,169,77,0.08),
+    rgba(255,212,59,0.08),  rgba(140,233,154,0.08),
+    rgba(77,171,247,0.08),  rgba(151,117,250,0.08),
+    rgba(247,131,172,0.08));
+  border-radius: 16px;
+  padding: 20px;
+  margin: var(--sp-4) 0;
+  position: relative;
+  /* グラデーションボーダー: 疑似要素で実装 */
+  isolation: isolate;
+}
+.home-install-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1.5px;
+  background: linear-gradient(135deg,
+    #FF6B6B, #FFA94D, #FFD43B,
+    #8CE99A, #4DABF7, #9775FA, #F783AC);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.home-install-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.home-install-icon {
+  font-size: 30px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.home-install-title h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+  color: var(--text-primary);
+}
+
+.home-install-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.home-install-benefits {
+  margin-bottom: 14px;
+}
+
+.home-benefit-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.benefit-check {
+  color: var(--color-long, #00C896);
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  width: 16px;
+}
+
+.home-install-btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg,
+    #FF6B6B 0%, #FFA94D 17%, #FFD43B 33%,
+    #8CE99A 50%, #4DABF7 67%, #9775FA 83%, #F783AC 100%);
+  color: #fff;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+  margin-top: 4px;
+  box-shadow: 0 4px 14px rgba(151,117,250,0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  display: block;
+}
+.home-install-btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(151,117,250,0.2);
+}
+
+.home-install-btn-skip {
+  width: 100%;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 10px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  touch-action: manipulation;
+  display: block;
+  margin-top: 4px;
+}
+.home-install-btn-skip:active { color: var(--text-secondary); }
+
+/* --------------------------------------------------------------------------
  * @media: インストール済みなら非表示
  * -------------------------------------------------------------------------- */
 @media (display-mode: standalone) {

@@ -14,7 +14,7 @@
  *   - CACHE_NAME を変更すると古いキャッシュを activate で一掃
  * ========================================================================== */
 
-const CACHE_VERSION = 'v5.5.0-20260416-ios1';
+const CACHE_VERSION = 'v5.6.0-20260416-ios2';
 const CACHE_NAME    = 'rainbow-trial-' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -34,6 +34,7 @@ const PRECACHE_URLS = [
   'js/signals.js',
   'css/install.css',
   'js/device-detect.js',
+  'js/home-install.js',
   'js/install-detector.js',
   'js/install-handler.js',
   'js/install-modal.js',
