@@ -117,7 +117,7 @@
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
 
-    canvas.width = canvas.offsetWidth || canvas.parentElement.offsetWidth || 340;
+    canvas.width = canvas.offsetWidth || (canvas.parentElement && canvas.parentElement.offsetWidth) || 340;
 
     // データ構築: 初期値 → 各トレード後の残高
     var points = [{ label: 'START', capital: 300000 }];
@@ -171,7 +171,7 @@
     var canvas = document.getElementById('winrate-chart');
     if (!canvas) return;
     var ctx    = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth || canvas.parentElement.offsetWidth || 340;
+    canvas.width = canvas.offsetWidth || (canvas.parentElement && canvas.parentElement.offsetWidth) || 340;
 
     var realTrades = trades.filter(function (t) { return t.type !== 'skip'; });
     if (realTrades.length < 3) {

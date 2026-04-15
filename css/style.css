@@ -348,6 +348,19 @@ input, textarea, select, button { font: inherit; color: inherit; }
   border-radius: 0 0 2px 2px;
 }
 
+/* 5ボタン時の小画面対応: 375px以下でテキストラベルを非表示 */
+@media (max-width: 375px) {
+  .tabbar__btn > span:not(.tabbar__icon) {
+    display: none;
+  }
+  .tabbar__btn {
+    padding: 6px 0;
+  }
+  .tabbar__btn .tabbar__icon {
+    font-size: 1.4rem;
+  }
+}
+
 /* セクションタイトル */
 .section-title {
   font-size: 0.8rem;

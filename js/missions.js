@@ -213,7 +213,7 @@
       '<div class="overlay__card daily-complete-card">' +
         '<div class="daily-complete-card__emoji">📅</div>' +
         '<div class="daily-complete-card__title">デイリーコンプ達成!</div>' +
-        '<div class="daily-complete-card__body">Day ' + day + ' の全ミッションを達成しました！<br>+' + global.LevelSystem.XP_RULES.daily_mission + ' XP ボーナス</div>' +
+        '<div class="daily-complete-card__body">Day ' + day + ' の全ミッションを達成しました！<br>+' + ((global.LevelSystem && global.LevelSystem.XP_RULES && global.LevelSystem.XP_RULES.daily_mission) || 50) + ' XP ボーナス</div>' +
         '<button class="btn btn--primary daily-complete-card__btn">閉じる</button>' +
       '</div>';
 

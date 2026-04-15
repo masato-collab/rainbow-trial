@@ -134,7 +134,8 @@
       el.classList.add('achievement-toast--enter');
     });
 
-    // タップで即消し
+    // タップで即消し(touchend で 300ms 遅延を回避)
+    el.addEventListener('touchend', function (e) { e.preventDefault(); dismissToast(el); }, { passive: false });
     el.addEventListener('click', function () { dismissToast(el); });
 
     // 自動消滅
