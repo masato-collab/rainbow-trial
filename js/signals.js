@@ -95,7 +95,13 @@
       } else {
         G().markDelivered(sig.id, 'realtime');
         realtime.push(sig);
-        if (N()) N().showInAppNotification(sig);
+        if (N()) {
+          N().showInAppNotification(sig);
+          // Level 3: ブラウザ通知(許可+設定+レアリティ判定後)
+          if (N().pushBrowserNotification) {
+            N().pushBrowserNotification(sig);
+          }
+        }
       }
     }
 

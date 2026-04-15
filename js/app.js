@@ -52,6 +52,13 @@
       global.Signals.init();
       global.Trade.init();
 
+      // 起動回数 +1(PWA インストール促進の判定に使う)
+      this._bumpLaunchCount();
+      // baselines JSON は非同期で取得(失敗しても致命ではない)
+      this._loadPriceBaselines();
+      // beforeinstallprompt を捕捉(Android Chrome 向け)
+      this._captureInstallPrompt();
+
       this.hookNotifications();
       this.bindGlobalEvents();
       this.subscribeEvents();
@@ -67,6 +74,13 @@
 
       // 起動直後の最後アクティブ更新
       global.TrialStore.updateLastActive();
+
+      // プロモバナーの出し入れ判定(非同期で遅延実行)
+      const self = this;
+      setTimeout(function () {
+        self.maybeShowNotifyBanner();
+        self.maybeShowInstallBanner();
+      }, 2000);
     },
 
     hookNotifications: function () {
@@ -100,6 +114,406 @@
           }
         });
       }
+
+      // 設定 / デバッグの汎用クローズ
+      document.querySelectorAll('.overlay [data-close]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const key = btn.getAttribute('data-close');
+          const el  = document.getElementById('overlay-' + key);
+          if (el) el.classList.remove('is-open');
+        });
+      });
+      ['overlay-settings', 'overlay-debug'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('click', function (e) {
+          if (e.target === el) el.classList.remove('is-open');
+        });
+      });
+
+      // ヘッダーの ⚙️ 設定ボタン
+      const settingsBtn = document.getElementById('header-settings');
+      if (settingsBtn) settingsBtn.addEventListener('click', function () { self.openSettings(); });
+
+      // 通知許可バナー
+      const notifBar = document.getElementById('promo-notify');
+      if (notifBar) {
+        notifBar.addEventListener('click', function (e) {
+          const act = e.target && e.target.getAttribute('data-act');
+          if (act === 'allow')  self.handleAllowNotifications();
+          if (act === 'later')  self.dismissNotifyBanner();
+        });
+      }
+
+      // ホーム画面追加バナー
+      const installBar = document.getElementById('promo-install');
+      if (installBar) {
+        installBar.addEventListener('click', function (e) {
+          const act = e.target && e.target.getAttribute('data-act');
+          if (act === 'install') self.handleInstallPrompt();
+          if (act === 'later')   self.dismissInstallBanner();
+        });
+      }
+
+      // Service Worker からの通知クリック
+      if (global.Notifications && global.Notifications.bindServiceWorkerMessages) {
+        global.Notifications.bindServiceWorkerMessages(function (signalId) {
+          self.openSignalDetail(signalId);
+        });
+      }
+
+      // Konami Code(デバッグメニュー)
+      this._bindKonami();
+    },
+
+    _bindKonami: function () {
+      const self = this;
+      const seq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+      let idx = 0;
+      document.addEventListener('keydown', function (e) {
+        const key = e.code || e.key;
+        if (key === seq[idx]) { idx++; if (idx === seq.length) { idx = 0; self.openDebugMenu(); } }
+        else { idx = (key === seq[0]) ? 1 : 0; }
+      });
+      // モバイル用: ヘッダーロゴを 5 回連タップで開く
+      let tapCount = 0, tapTimer = null;
+      const logo = document.querySelector('.app-header__logo');
+      if (logo) logo.addEventListener('click', function () {
+        tapCount++;
+        if (tapTimer) clearTimeout(tapTimer);
+        tapTimer = setTimeout(function () { tapCount = 0; }, 1500);
+        if (tapCount >= 5) { tapCount = 0; self.openDebugMenu(); }
+      });
+    },
+
+    /* ======================================================================
+     * 設定画面
+     * ====================================================================== */
+    _bumpLaunchCount: function () {
+      try {
+        const st = global.TrialStore.getState();
+        const s  = st.settings || {};
+        const nx = Object.assign({}, s, { launchCount: (s.launchCount || 0) + 1 });
+        global.TrialStore.setState({ settings: nx });
+      } catch (e) {}
+    },
+
+    _loadPriceBaselines: function () {
+      if (typeof fetch === 'undefined') return;
+      fetch('data/price-baselines.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { if (d) global.PRICE_BASELINES = d; })
+        .catch(function () {});
+    },
+
+    _captureInstallPrompt: function () {
+      const self = this;
+      this._installPromptEvent = null;
+      global.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        self._installPromptEvent = e;
+        self.maybeShowInstallBanner();
+      });
+      global.addEventListener('appinstalled', function () {
+        self.dismissInstallBanner();
+      });
+    },
+
+    /* ======================================================================
+     * プロモバナー(通知許可 / インストール)
+     * ====================================================================== */
+    maybeShowNotifyBanner: function () {
+      const N = global.Notifications;
+      if (!N || !N.getPermission) return;
+      if (N.getPermission() !== 'default') return;
+      const st = global.TrialStore.getState();
+      const lc = (st.settings && st.settings.launchCount) || 0;
+      const dismissed = st.settings && st.settings.notifyBannerDismissedAt;
+      if (dismissed && Date.now() - new Date(dismissed).getTime() < 3 * 86400 * 1000) return;
+      const elapsedMin = global.TrialStore.getElapsedMinutes();
+      if (elapsedMin < 60 && lc < 3) return;
+      const el = document.getElementById('promo-notify');
+      if (el) el.classList.remove('is-hidden');
+    },
+
+    dismissNotifyBanner: function () {
+      const el = document.getElementById('promo-notify');
+      if (el) el.classList.add('is-hidden');
+      const st = global.TrialStore.getState();
+      const s  = Object.assign({}, st.settings || {}, { notifyBannerDismissedAt: new Date().toISOString() });
+      global.TrialStore.setState({ settings: s });
+    },
+
+    handleAllowNotifications: async function () {
+      const N = global.Notifications;
+      if (!N) return;
+      const p = await N.requestPermission();
+      if (p === 'granted') N.updateNotificationSettings({ enabled: true });
+      this.dismissNotifyBanner();
+    },
+
+    maybeShowInstallBanner: function () {
+      const isStandalone = (global.matchMedia && global.matchMedia('(display-mode: standalone)').matches) ||
+                           global.navigator.standalone === true;
+      if (isStandalone) return;
+      const st = global.TrialStore.getState();
+      const lc = (st.settings && st.settings.launchCount) || 0;
+      const dismissed = st.settings && st.settings.installBannerDismissedAt;
+      if (dismissed && Date.now() - new Date(dismissed).getTime() < 1 * 86400 * 1000) return;
+      const elapsed = global.TrialStore.getElapsedMinutes();
+      if (elapsed < 3 * 24 * 60 && lc < 5) return;
+      const el = document.getElementById('promo-install');
+      if (el) el.classList.remove('is-hidden');
+    },
+
+    dismissInstallBanner: function () {
+      const el = document.getElementById('promo-install');
+      if (el) el.classList.add('is-hidden');
+      const st = global.TrialStore.getState();
+      const s  = Object.assign({}, st.settings || {}, { installBannerDismissedAt: new Date().toISOString() });
+      global.TrialStore.setState({ settings: s });
+    },
+
+    handleInstallPrompt: async function () {
+      if (this._installPromptEvent) {
+        this._installPromptEvent.prompt();
+        try { await this._installPromptEvent.userChoice; } catch (e) {}
+        this._installPromptEvent = null;
+        this.dismissInstallBanner();
+      } else {
+        alert('ホーム画面に追加する手順:\n\n1. 画面下部の「共有」ボタン(□↑)をタップ\n2. 「ホーム画面に追加」を選択\n3. 「追加」をタップ');
+      }
+    },
+
+    /* ======================================================================
+     * デバッグメニュー (Konami Code または ロゴ 5 連タップで開く)
+     * ====================================================================== */
+    openDebugMenu: function () {
+      const el = document.getElementById('overlay-debug');
+      if (!el) return;
+      this.renderDebugMenu();
+      el.classList.add('is-open');
+    },
+
+    renderDebugMenu: function () {
+      const body = document.getElementById('debug-body');
+      if (!body) return;
+      const self = this;
+      const st = global.TrialStore.getState();
+      const snap = global.GameState.snapshot();
+      const baselines = global.PRICE_BASELINES || {};
+      const swSupported = 'serviceWorker' in navigator;
+
+      function act(id, label) {
+        return '<div class="settings-row"><span class="settings-row__label">' + label + '</span>' +
+          '<button class="promo-bar__btn promo-bar__btn--primary" type="button" data-debug="' + id + '">実行</button></div>';
+      }
+
+      body.innerHTML =
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">進行</div>' +
+          act('next-signal', '次のシグナルを今すぐ受信') +
+          act('day-plus',    'Day を進める (+1)') +
+          act('day-minus',   'Day を戻す (-1)') +
+        '</div>' +
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">通知 / PWA</div>' +
+          act('test-notif',  'テスト通知を発火') +
+          act('sw-check',    'Service Worker 状況確認') +
+          act('pwa-check',   'PWA インストール状況確認') +
+        '</div>' +
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">現在値</div>' +
+          '<div class="settings-info">' +
+            'Day: <strong>' + snap.displayDay + ' / 7</strong><br>' +
+            '経過: <strong>' + snap.elapsedMinutes + '分</strong>' +
+            (snap.testMode ? ' (テストモード)' : '') + '<br>' +
+            'USDJPY: <strong>' + (baselines.USDJPY ? baselines.USDJPY.current : '—') + '</strong>  ' +
+            'BTCUSD: <strong>' + (baselines.BTCUSD ? baselines.BTCUSD.current : '—') + '</strong><br>' +
+            '残トレード: <strong>' + (st.trades || []).length + '</strong>件<br>' +
+            'SW 対応: <strong>' + (swSupported ? 'yes' : 'no') + '</strong>' +
+          '</div>' +
+        '</div>' +
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">破壊的操作</div>' +
+          '<button class="danger-btn" type="button" data-debug="reset-all">全データリセット</button>' +
+        '</div>';
+
+      body.querySelectorAll('[data-debug]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          self.handleDebugAction(btn.getAttribute('data-debug'));
+        });
+      });
+    },
+
+    handleDebugAction: function (action) {
+      const self = this;
+      switch (action) {
+        case 'next-signal': {
+          const up = global.GameState.getNextUpcomingSignal();
+          if (!up) { alert('これ以上シグナルはありません'); return; }
+          const mins = up.minutesUntil;
+          global.TrialStore.shiftStartDate(-mins);
+          global.Signals.processScheduledSignals('realtime');
+          self.renderCurrentScreen();
+          self.renderDebugMenu();
+          break;
+        }
+        case 'day-plus': {
+          const len = global.GameState.snapshot().dayLengthMinutes;
+          global.TrialStore.shiftStartDate(-len);
+          self.renderAll();
+          self.renderDebugMenu();
+          break;
+        }
+        case 'day-minus': {
+          const len = global.GameState.snapshot().dayLengthMinutes;
+          global.TrialStore.shiftStartDate(len);
+          self.renderAll();
+          self.renderDebugMenu();
+          break;
+        }
+        case 'test-notif': {
+          const N = global.Notifications;
+          if (!N) return;
+          if (N.getPermission() !== 'granted') {
+            N.requestPermission().then(function (p) {
+              if (p === 'granted') self.handleDebugAction('test-notif');
+            });
+            return;
+          }
+          N.pushBrowserNotification({
+            id: 9999, pair: 'USDJPY', direction: 'long', rarity: 'epic'
+          });
+          break;
+        }
+        case 'sw-check': {
+          if (!('serviceWorker' in navigator)) { alert('Service Worker 非対応'); return; }
+          navigator.serviceWorker.getRegistration().then(function (reg) {
+            alert(reg ? 'SW 登録済み\nscope: ' + reg.scope : 'SW 未登録');
+          });
+          break;
+        }
+        case 'pwa-check': {
+          const standalone = (matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+          alert('standalone: ' + standalone + '\ninstall prompt: ' + (self._installPromptEvent ? 'available' : 'none'));
+          break;
+        }
+        case 'reset-all': {
+          if (!confirm('全データを削除します。よろしいですか?')) return;
+          global.TrialStore.resetAll();
+          location.replace('welcome.html');
+          break;
+        }
+      }
+    },
+
+    openSettings: function () {
+      const el = document.getElementById('overlay-settings');
+      if (!el) return;
+      this.renderSettings();
+      el.classList.add('is-open');
+    },
+
+    renderSettings: function () {
+      const body = document.getElementById('settings-body');
+      if (!body) return;
+      const N = global.Notifications;
+      const perm = N && N.getPermission ? N.getPermission() : 'unsupported';
+      const cfg  = N && N.getNotificationSettings ? N.getNotificationSettings() : { enabled: false, rarities: {} };
+      const state = global.TrialStore.getState();
+      const baselines = (global.PRICE_BASELINES || {});
+      const lastUpdated = (baselines.lastUpdated || '').split('T')[0] || '—';
+
+      function row(label, control, desc) {
+        return '<div class="settings-row"><div><div class="settings-row__label">' + label + '</div>' +
+          (desc ? '<div class="settings-row__desc">' + desc + '</div>' : '') + '</div>' + control + '</div>';
+      }
+      function toggle(id, checked) {
+        return '<label class="switch"><input type="checkbox" id="' + id + '"' + (checked ? ' checked' : '') + '><span class="switch__slider"></span></label>';
+      }
+      function rarityRow(key, label, color) {
+        const on = cfg.rarities[key] !== false;
+        return '<div class="settings-row"><span class="rarity-pill rarity-pill--' + key + '">' + label + '</span>' +
+          toggle('r-' + key, on) + '</div>';
+      }
+
+      const permText = perm === 'granted' ? '✅ 許可済み'
+                     : perm === 'denied'  ? '❌ ブラウザでブロックされています'
+                     : perm === 'unsupported' ? 'この環境では利用できません'
+                     : '未許可(ONにすると許可を求めます)';
+
+      body.innerHTML =
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">🔔 ブラウザ通知</div>' +
+          row('通知を受け取る', toggle('notif-enabled', cfg.enabled), permText) +
+        '</div>' +
+
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">レアリティ別の通知</div>' +
+          '<div class="rarity-grid">' +
+            rarityRow('normal',    'NORMAL') +
+            rarityRow('good',      'GOOD') +
+            rarityRow('rare',      'RARE') +
+            rarityRow('epic',      'EPIC') +
+            rarityRow('legendary', 'LEGENDARY') +
+          '</div>' +
+        '</div>' +
+
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">📱 ホーム画面に追加</div>' +
+          '<div class="settings-info">' +
+          'アプリのように使うには、ブラウザメニューから「ホーム画面に追加」を選択してください。' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">🔄 価格データ</div>' +
+          '<div class="settings-info">最終更新: <strong>' + lastUpdated + '</strong></div>' +
+        '</div>' +
+
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">🗑️ データリセット</div>' +
+          '<button class="danger-btn" id="btn-reset-all" type="button">全データを削除</button>' +
+        '</div>' +
+
+        '<div class="settings-section">' +
+          '<div class="settings-section__title">ℹ️ アプリ情報</div>' +
+          '<div class="settings-info">バージョン: <strong>2.0.0</strong></div>' +
+        '</div>';
+
+      const self = this;
+      // 通知 ON/OFF
+      const enBox = document.getElementById('notif-enabled');
+      if (enBox) enBox.addEventListener('change', async function () {
+        if (enBox.checked && perm !== 'granted') {
+          const p = await N.requestPermission();
+          if (p !== 'granted') { enBox.checked = false; self.renderSettings(); return; }
+        }
+        N.updateNotificationSettings({ enabled: enBox.checked });
+        self.renderSettings();
+      });
+      // レアリティ
+      ['normal','good','rare','epic','legendary'].forEach(function (key) {
+        const box = document.getElementById('r-' + key);
+        if (!box) return;
+        box.addEventListener('change', function () {
+          const cur = N.getNotificationSettings();
+          const next = Object.assign({}, cur.rarities, { [key]: box.checked });
+          N.updateNotificationSettings({ rarities: next });
+        });
+      });
+      // リセット
+      const rst = document.getElementById('btn-reset-all');
+      if (rst) rst.addEventListener('click', function () {
+        if (confirm('本当に全データを削除しますか?この操作は取り消せません。')) {
+          try {
+            if (global.TrialStore && global.TrialStore.resetAll) global.TrialStore.resetAll();
+            else localStorage.removeItem('rainbow-trial-v1');
+          } catch (e) {}
+          location.replace('welcome.html');
+        }
+      });
     },
 
     subscribeEvents: function () {
@@ -1080,9 +1494,35 @@
   };
 
   /* ========================================================================
+   * Service Worker 登録 (Phase 2)
+   * ======================================================================== */
+  function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    // file:// 環境では SW は動かないのでスキップ
+    if (location.protocol === 'file:') return;
+    navigator.serviceWorker.register('./service-worker.js')
+      .then(function (reg) {
+        // アップデート検知: 新バージョンが来たら次回起動で自動反映
+        reg.addEventListener('updatefound', function () {
+          const w = reg.installing;
+          if (!w) return;
+          w.addEventListener('statechange', function () {
+            if (w.state === 'installed' && navigator.serviceWorker.controller) {
+              console.log('[SW] new version installed; will activate on next load');
+            }
+          });
+        });
+      })
+      .catch(function (e) { console.warn('[SW] register failed:', e.message); });
+  }
+
+  /* ========================================================================
    * Boot
    * ======================================================================== */
-  function boot() { App.init(); }
+  function boot() {
+    registerServiceWorker();
+    App.init();
+  }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
   } else {

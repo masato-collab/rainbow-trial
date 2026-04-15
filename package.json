@@ -1,0 +1,23 @@
+{
+  "name": "rainbow-trial",
+  "version": "2.0.0",
+  "description": "Rainbow System 7日間体験アプリ",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "update-prices": "node scripts/update-prices.js",
+    "regenerate": "node scripts/regenerate-scenarios.js",
+    "dev": "python3 -m http.server 8000",
+    "deploy": "git add . && git commit -m \"Update prices and deploy\" && git push"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/masato-collab/rainbow-trial.git"
+  },
+  "devDependencies": {
+    "sharp": "^0.34.5"
+  }
+}

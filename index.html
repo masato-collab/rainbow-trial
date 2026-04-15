@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0F1419">
+  <meta name="theme-color" content="#9775FA">
   <meta name="description" content="Rainbow System を、7日間体験。実際のサロンで配信されるトレードシグナルを疑似体験できるトレーニングアプリ。">
   <meta name="format-detection" content="telephone=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,15 +22,32 @@
 
   <title>Rainbow Trial</title>
 
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-title" content="Rainbow Trial">
+
+  <!-- Icons -->
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <link rel="apple-touch-icon" href="assets/favicon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/icons/icon-512.png">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon-180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="assets/icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon-180.png">
+
+  <!-- iOS Splash Screens -->
+  <link rel="apple-touch-startup-image" href="assets/icons/splash/splash-2048x2732.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="assets/icons/splash/splash-1668x2388.png" media="(device-width: 834px)  and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="assets/icons/splash/splash-1536x2048.png" media="(device-width: 768px)  and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="assets/icons/splash/splash-1125x2436.png" media="(device-width: 375px)  and (device-height: 812px)  and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="assets/icons/splash/splash-828x1792.png"  media="(device-width: 414px)  and (device-height: 896px)  and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+  <link rel="apple-touch-startup-image" href="assets/icons/splash/splash-750x1334.png"  media="(device-width: 375px)  and (device-height: 667px)  and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <link rel="stylesheet" href="css/style.css?v=20260416-day7">
-  <link rel="stylesheet" href="css/components.css?v=20260416-day7">
-  <link rel="stylesheet" href="css/chart.css?v=20260416-day7">
+  <link rel="stylesheet" href="css/style.css?v=20260416-pwa">
+  <link rel="stylesheet" href="css/components.css?v=20260416-pwa">
+  <link rel="stylesheet" href="css/chart.css?v=20260416-pwa">
 
   <style>
     /* 画面切替(index 固有) */
@@ -72,9 +89,28 @@
         <img src="assets/logo.svg" alt="" width="132">
       </div>
       <div class="app-header__day" id="header-day">Day 1 / 7</div>
+      <button class="app-header__settings" id="header-settings" type="button" aria-label="設定">⚙️</button>
       <div class="app-header__capital mono" id="header-capital" role="button" tabindex="0" aria-label="現在の仮想資金">¥300,000</div>
     </div>
   </header>
+
+  <!-- ==========================================================================
+       プロモーションバー(通知許可 / ホーム画面追加)
+       ========================================================================== -->
+  <div class="promo-bar is-hidden" id="promo-notify" role="region" aria-label="通知を許可">
+    <span class="promo-bar__text">🔔 シグナル通知を有効にしませんか?見逃し防止に役立ちます。</span>
+    <span class="promo-bar__actions">
+      <button class="promo-bar__btn" type="button" data-act="later">後で</button>
+      <button class="promo-bar__btn promo-bar__btn--primary" type="button" data-act="allow">許可する</button>
+    </span>
+  </div>
+  <div class="promo-bar is-hidden" id="promo-install" role="region" aria-label="ホーム画面に追加">
+    <span class="promo-bar__text">📱 ホーム画面に追加して、アプリのように使えます</span>
+    <span class="promo-bar__actions">
+      <button class="promo-bar__btn" type="button" data-act="later">後で</button>
+      <button class="promo-bar__btn promo-bar__btn--primary" type="button" data-act="install">追加</button>
+    </span>
+  </div>
 
   <!-- ==========================================================================
        通知バー(Level 1、notifications.js が動的挿入)
@@ -144,24 +180,50 @@
   </div>
 
   <!-- ==========================================================================
+       設定モーダル(overlay)
+       ========================================================================== -->
+  <div class="overlay" id="overlay-settings" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="overlay__card overlay__card--settings">
+      <div class="settings-head">
+        <h2 id="settings-title">⚙️ 設定</h2>
+        <button class="overlay-close" type="button" data-close="settings" aria-label="閉じる">×</button>
+      </div>
+      <div class="overlay__body" id="settings-body"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       デバッグメニュー(Konami Code で開く)
+       ========================================================================== -->
+  <div class="overlay" id="overlay-debug" role="dialog" aria-modal="true" aria-labelledby="debug-title">
+    <div class="overlay__card">
+      <div class="settings-head">
+        <h2 id="debug-title">🔧 デバッグメニュー</h2>
+        <button class="overlay-close" type="button" data-close="debug" aria-label="閉じる">×</button>
+      </div>
+      <div class="overlay__body" id="debug-body"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
        アプリ本体: 依存関係順に読み込み
        ========================================================================== -->
   <!-- データ層 -->
-  <script src="js/storage.js?v=20260416-day7"></script>
-  <script src="data/scenarios.js?v=20260416-day7"></script>
+  <script src="js/storage.js?v=20260416-pwa"></script>
+  <script src="data/scenarios.js?v=20260416-pwa"></script>
 
   <!-- 状態・通知 -->
-  <script src="js/game-state.js?v=20260416-day7"></script>
-  <script src="js/notifications.js?v=20260416-day7"></script>
+  <script src="js/game-state.js?v=20260416-pwa"></script>
+  <script src="js/notifications.js?v=20260416-pwa"></script>
 
   <!-- ドメインロジック -->
-  <script src="js/signals.js?v=20260416-day7"></script>
-  <script src="js/judgment.js?v=20260416-day7"></script>
-  <script src="js/chart.js?v=20260416-day7"></script>
-  <script src="js/trade.js?v=20260416-day7"></script>
+  <script src="js/signals.js?v=20260416-pwa"></script>
+  <script src="js/judgment.js?v=20260416-pwa"></script>
+  <script src="js/chart.js?v=20260416-pwa"></script>
+  <script src="js/trade.js?v=20260416-pwa"></script>
 
   <!-- 統合層 -->
-  <script src="js/app.js?v=20260416-day7"></script>
+  <script src="js/app.js?v=20260416-pwa"></script>
 
 </body>
 </html>

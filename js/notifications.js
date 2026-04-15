@@ -430,6 +430,129 @@
   /* --------------------------------------------------------------------------
    * 11. 公開 API
    * -------------------------------------------------------------------------- */
+  /* --------------------------------------------------------------------------
+   * Level 3 — Web Notification API (Phase 2)
+   * -------------------------------------------------------------------------- */
+
+  // レアリティ別の通知挙動デフォルト
+  const RARITY_BEHAVIOR = {
+    normal:    { browserNotify: false, vibrate: null,           requireInteraction: false },
+    good:      { browserNotify: true,  vibrate: null,           requireInteraction: false },
+    rare:      { browserNotify: true,  vibrate: [100, 50, 100], requireInteraction: false },
+    epic:      { browserNotify: true,  vibrate: [150, 80, 150, 80, 150], requireInteraction: true },
+    legendary: { browserNotify: true,  vibrate: [200,100,200,100,200,100,200], requireInteraction: true }
+  };
+
+  function getNotificationSettings() {
+    const store = global.TrialStore;
+    if (!store) return { enabled: false, rarities: {} };
+    const s = store.getState() || {};
+    const cfg = (s.settings && s.settings.notifications) || {};
+    return {
+      enabled:  cfg.enabled !== false,   // 既定で ON
+      rarities: cfg.rarities || { normal: false, good: true, rare: true, epic: true, legendary: true }
+    };
+  }
+
+  function updateNotificationSettings(patch) {
+    const store = global.TrialStore;
+    if (!store) return;
+    const s = store.getState();
+    const cur = (s.settings && s.settings.notifications) || {};
+    const next = Object.assign({}, cur, patch);
+    const settings = Object.assign({}, s.settings || {}, { notifications: next });
+    store.setState({ settings: settings });
+  }
+
+  function getPermission() {
+    if (typeof Notification === 'undefined') return 'unsupported';
+    return Notification.permission;   // 'default' | 'granted' | 'denied'
+  }
+
+  async function requestPermission() {
+    if (typeof Notification === 'undefined') return 'unsupported';
+    if (Notification.permission !== 'default') return Notification.permission;
+    try {
+      const p = await Notification.requestPermission();
+      const store = global.TrialStore;
+      if (store) {
+        const s = store.getState();
+        const settings = Object.assign({}, s.settings || {}, { notificationsGranted: p === 'granted' });
+        store.setState({ settings: settings });
+      }
+      return p;
+    } catch (e) {
+      console.warn('[Notifications] requestPermission failed', e);
+      return 'default';
+    }
+  }
+
+  function canPushBrowser() {
+    return getPermission() === 'granted' && typeof navigator !== 'undefined' && 'serviceWorker' in navigator;
+  }
+
+  function rarityAllowed(rarity) {
+    const cfg = getNotificationSettings();
+    if (!cfg.enabled) return false;
+    const key = String(rarity || '').toLowerCase();
+    return cfg.rarities[key] !== false && (RARITY_BEHAVIOR[key] || {}).browserNotify !== false;
+  }
+
+  /** シグナル受信時のブラウザ通知。失敗しても例外は投げない */
+  async function pushBrowserNotification(signal) {
+    if (!signal) return false;
+    if (!canPushBrowser()) return false;
+    const rarity = String(signal.rarity || 'normal').toLowerCase();
+    const behavior = RARITY_BEHAVIOR[rarity] || RARITY_BEHAVIOR.normal;
+    if (!behavior.browserNotify) return false;
+    if (!rarityAllowed(rarity)) return false;
+
+    const dirJp = directionJp(signal.direction);
+    const pairJp = formatPair(signal.pair);
+    const rarityLabel = rarity === 'legendary' ? 'LEGENDARY シグナル!'
+                      : rarity === 'epic'      ? 'EPIC'
+                      : rarity === 'rare'      ? 'RARE'
+                      : rarity === 'good'      ? 'GOOD'
+                      : '';
+
+    const payload = {
+      type: 'show-notification',
+      title: '🌈 Rainbow Trial',
+      body:  pairJp + ' ' + dirJp + 'シグナル受信' + (rarityLabel ? ' (' + rarityLabel + ')' : ''),
+      icon:  'assets/icons/icon-192.png',
+      badge: 'assets/icons/icon-72.png',
+      tag:   'rainbow-signal-' + signal.id,
+      data:  { signalId: signal.id, url: 'index.html#signal-' + signal.id },
+      vibrate: behavior.vibrate || undefined,
+      requireInteraction: behavior.requireInteraction
+    };
+
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      if (reg.active) {
+        reg.active.postMessage(payload);
+      } else {
+        // SW 未アクティブ時のフォールバック
+        new Notification(payload.title, payload);
+      }
+      return true;
+    } catch (e) {
+      console.warn('[Notifications] browser push failed', e);
+      return false;
+    }
+  }
+
+  /** Service Worker からの notification-click を受け取る入口 */
+  function bindServiceWorkerMessages(onSignalOpen) {
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+    navigator.serviceWorker.addEventListener('message', function (ev) {
+      const d = ev.data || {};
+      if (d.type === 'notification-click' && d.signalId != null && typeof onSignalOpen === 'function') {
+        onSignalOpen(d.signalId);
+      }
+    });
+  }
+
   const Notifications = {
     // 初期化
     init: init,
@@ -442,6 +565,17 @@
     // Level 2
     updateTabTitle: updateTabTitle,
     updateFavicon:  updateFavicon,
+
+    // Level 3 (Phase 2)
+    getPermission:             getPermission,
+    requestPermission:         requestPermission,
+    canPushBrowser:            canPushBrowser,
+    pushBrowserNotification:   pushBrowserNotification,
+    rarityAllowed:             rarityAllowed,
+    getNotificationSettings:   getNotificationSettings,
+    updateNotificationSettings: updateNotificationSettings,
+    bindServiceWorkerMessages: bindServiceWorkerMessages,
+    RARITY_BEHAVIOR:           RARITY_BEHAVIOR,
 
     // 未読カウント
     setUnreadCount:       setUnreadCount,

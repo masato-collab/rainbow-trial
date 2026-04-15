@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Rainbow Trial">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F2E"/>
+      <stop offset="100%" stop-color="#0F1419"/>
+    </linearGradient>
+    <linearGradient id="rainbow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="16%" stop-color="#FFA94D"/>
+      <stop offset="33%" stop-color="#FFD43B"/>
+      <stop offset="50%" stop-color="#8CE99A"/>
+      <stop offset="66%" stop-color="#4DABF7"/>
+      <stop offset="83%" stop-color="#9775FA"/>
+      <stop offset="100%" stop-color="#F783AC"/>
+    </linearGradient>
+    <linearGradient id="candleUp" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#26A69A"/>
+      <stop offset="100%" stop-color="#00E676"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="url(#bgGrad)"/>
+
+  <!-- 中央: 虹のアーク(7 本) -->
+  <g transform="translate(256, 360)" filter="url(#glow)">
+    <!-- アーク半径 16 刻みで 7 本 -->
+    <path d="M -168 0 A 168 168 0 0 1 168 0" fill="none" stroke="#FF6B6B" stroke-width="22" stroke-linecap="round"/>
+    <path d="M -144 0 A 144 144 0 0 1 144 0" fill="none" stroke="#FFA94D" stroke-width="22" stroke-linecap="round"/>
+    <path d="M -120 0 A 120 120 0 0 1 120 0" fill="none" stroke="#FFD43B" stroke-width="22" stroke-linecap="round"/>
+    <path d="M  -96 0 A  96  96 0 0 1  96 0" fill="none" stroke="#8CE99A" stroke-width="22" stroke-linecap="round"/>
+    <path d="M  -72 0 A  72  72 0 0 1  72 0" fill="none" stroke="#4DABF7" stroke-width="22" stroke-linecap="round"/>
+    <path d="M  -48 0 A  48  48 0 0 1  48 0" fill="none" stroke="#9775FA" stroke-width="22" stroke-linecap="round"/>
+    <path d="M  -24 0 A  24  24 0 0 1  24 0" fill="none" stroke="#F783AC" stroke-width="22" stroke-linecap="round"/>
+  </g>
+
+  <!-- 上段: ローソク足 3 本 -->
+  <g transform="translate(256, 120)">
+    <!-- 左 陰線 -->
+    <line x1="-80" y1="-24" x2="-80" y2="56" stroke="#EF5350" stroke-width="4" stroke-linecap="round"/>
+    <rect x="-96" y="-6" width="32" height="50" fill="#EF5350" rx="2"/>
+    <!-- 中央 陽線(大) -->
+    <line x1="0" y1="-40" x2="0" y2="68" stroke="#26C281" stroke-width="4" stroke-linecap="round"/>
+    <rect x="-18" y="-26" width="36" height="80" fill="url(#candleUp)" rx="2"/>
+    <!-- 右 陽線 -->
+    <line x1="80" y1="-20" x2="80" y2="52" stroke="#26C281" stroke-width="4" stroke-linecap="round"/>
+    <rect x="64" y="-4" width="32" height="44" fill="url(#candleUp)" rx="2"/>
+  </g>
+</svg>
