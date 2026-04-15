@@ -34,12 +34,22 @@
   const TICK_INTERVAL_MS = 5000;   // 本番:5秒ごと
   const TEST_TICK_MS     = 2000;   // テストモード時:2秒ごと(1分=30倍速相当)
 
+  // リアルタイムスケジューラー設定
+  const FIRST_SIGNAL_DELAY_MS = 30 * 1000;          // 初回: 30秒後
+  const MIN_NEXT_INTERVAL_MS  = 5  * 60 * 1000;     // 以降: 最短 5 分
+  const MAX_NEXT_INTERVAL_MS  = 10 * 60 * 1000;     // 以降: 最長 10 分
+
   /* --------------------------------------------------------------------------
    * 2. 状態
    * -------------------------------------------------------------------------- */
   let tickTimer        = null;
   let deliveryCallback = null;     // 新規配信時に app.js 側で拾う用
   let inited           = false;
+
+  // リアルタイムスケジューラー状態
+  let realtimeTimer      = null;
+  let realtimeQueue      = [];
+  let realtimeCurrentDay = null;
 
   /* --------------------------------------------------------------------------
    * 3. 依存ヘルパ(ロード順序の都合で関数経由でアクセス)
@@ -143,6 +153,86 @@
   function syncUnreadCount() {
     if (!N() || !S()) return;
     N().setUnreadCount(S().getUnviewedSignalIds().length);
+  }
+
+  /* --------------------------------------------------------------------------
+   * 8a. リアルタイムスケジューラー
+   *     初回: 30秒後に配信
+   *     以降: ランダム 5〜10 分後に次を配信
+   *     現在の Day のシグナルのみ対象。Day が変わったら再起動。
+   * -------------------------------------------------------------------------- */
+  function buildRealtimeQueue() {
+    const day = G() && G().getCurrentDay ? G().getCurrentDay() : null;
+    if (!day || day === 'ended') { realtimeQueue = []; realtimeCurrentDay = day; return; }
+
+    const state  = S().getState();
+    const statusMap = new Map();
+    state.signals.forEach(function (r) { statusMap.set(r.signalId, r.status); });
+
+    // 現在の Day の scheduled シグナルをキューに積む
+    const daySignals = SC().getForDay ? SC().getForDay(day) : SC().getAll().filter(function (s) { return s.day === day; });
+    realtimeQueue = daySignals.filter(function (sig) {
+      const st = statusMap.get(sig.id);
+      return !st || st === 'scheduled';
+    }).sort(function (a, b) { return (a.relativeTime || 0) - (b.relativeTime || 0); });
+
+    realtimeCurrentDay = day;
+  }
+
+  function stopRealtimeScheduler() {
+    if (realtimeTimer) { clearTimeout(realtimeTimer); realtimeTimer = null; }
+  }
+
+  function startRealtimeScheduler() {
+    stopRealtimeScheduler();
+    buildRealtimeQueue();
+    if (realtimeQueue.length === 0) return;
+    realtimeTimer = setTimeout(deliverNextRealtime, FIRST_SIGNAL_DELAY_MS);
+  }
+
+  function deliverNextRealtime() {
+    realtimeTimer = null;
+
+    // Day が変わっていたらキューを再構築して初回 30 秒から再スタート
+    const day = G() && G().getCurrentDay ? G().getCurrentDay() : null;
+    if (day !== realtimeCurrentDay) {
+      buildRealtimeQueue();
+      if (realtimeQueue.length > 0) {
+        realtimeTimer = setTimeout(deliverNextRealtime, FIRST_SIGNAL_DELAY_MS);
+      }
+      return;
+    }
+
+    // 最新の状態を取得して、already-delivered をスキップ
+    const state = S().getState();
+    const statusMap = new Map();
+    state.signals.forEach(function (r) { statusMap.set(r.signalId, r.status); });
+
+    let sig = null;
+    while (realtimeQueue.length > 0) {
+      const candidate = realtimeQueue.shift();
+      const st = statusMap.get(candidate.id);
+      if (!st || st === 'scheduled') { sig = candidate; break; }
+      // tick 等で先に配信済みならスキップ
+    }
+
+    if (sig) {
+      G().markDelivered(sig.id, 'realtime');
+      if (N()) {
+        N().showInAppNotification(sig);
+        if (N().pushBrowserNotification) N().pushBrowserNotification(sig);
+      }
+      syncUnreadCount();
+      if (deliveryCallback) {
+        try { deliveryCallback({ realtime: [sig], pending: [], mode: 'tick' }); } catch (e) {}
+      }
+    }
+
+    // キューに残りがあれば 5〜10 分ランダム後に次を予約
+    if (realtimeQueue.length > 0) {
+      const delay = MIN_NEXT_INTERVAL_MS + Math.random() * (MAX_NEXT_INTERVAL_MS - MIN_NEXT_INTERVAL_MS);
+      realtimeTimer = setTimeout(deliverNextRealtime, delay);
+    }
   }
 
   /* --------------------------------------------------------------------------
@@ -319,9 +409,10 @@
       });
     }
 
-    // ティック開始
+    // ティック開始 + リアルタイムスケジューラー起動
     if (options.autoStart !== false) {
       startTicking();
+      startRealtimeScheduler();
     }
 
     inited = true;
@@ -361,10 +452,12 @@
    * -------------------------------------------------------------------------- */
   const Signals = {
     // ライフサイクル
-    init:           init,
-    startTicking:   startTicking,
-    stopTicking:    stopTicking,
-    restartTicking: restartTicking,
+    init:                   init,
+    startTicking:           startTicking,
+    stopTicking:            stopTicking,
+    restartTicking:         restartTicking,
+    startRealtimeScheduler: startRealtimeScheduler,
+    stopRealtimeScheduler:  stopRealtimeScheduler,
 
     // 処理
     processScheduledSignals: processScheduledSignals,

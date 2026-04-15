@@ -582,7 +582,6 @@
     tickSoftUpdate: function () {
       this.updateHeader();
       if (this.state.screen === 'main' && this.state.tab === 'home') {
-        this.updateHomeNextSignal();
         this.updateHomePosition();
       }
     },
@@ -818,9 +817,6 @@
       if (global.JudgmentScore) {
         html += global.JudgmentScore.renderSkillCard(state);
       }
-
-      // 次のシグナル予測
-      html += this._renderNextSignalCard(snap.next);
 
       // 学習リンク
       html +=

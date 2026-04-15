@@ -39,7 +39,8 @@
     /* --- HTML 生成(renderHome から呼ばれる) ---- */
 
     renderHTML: function () {
-      if (!this.shouldShow()) return '';
+      // インストール済み(スタンドアロン or フラグ)の場合は完全に非表示
+      if (this.isInstalled()) return '';
 
       // ボタン文言をデバイス/プロンプト状態に応じて決定
       var btnLabel = '📲 ホーム画面に追加する';
@@ -87,7 +88,17 @@
     /* --- イベントバインド(_bindHomeEvents から呼ばれる) ---- */
 
     init: function () {
-      var self = this;
+      var self    = this;
+      var section = document.getElementById('home-install-section');
+      if (!section) return;
+
+      // 一時的に非表示にしている場合は非表示にする(DOM には存在する)
+      if (this.isDismissed()) {
+        section.style.display = 'none';
+        return;
+      }
+
+      section.style.display = '';
 
       var mainBtn = document.getElementById('home-install-main-btn');
       if (mainBtn) {

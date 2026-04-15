@@ -14,7 +14,7 @@
  *   - CACHE_NAME を変更すると古いキャッシュを activate で一掃
  * ========================================================================== */
 
-const CACHE_VERSION = 'v5.6.0-20260416-ios2';
+const CACHE_VERSION = 'v5.8.0-20260416-realtime';
 const CACHE_NAME    = 'rainbow-trial-' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
