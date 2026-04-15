@@ -361,7 +361,171 @@
 
     { id: 30, day: 3, number: 1276, relativeTime: 3750,
       pair: 'BTCUSD', direction: 'long',  entry: 65810.0, tp: 66810.0, sl: 65320.0,
-      rarity: 'epic', chartCondition: 'ok', result: 'tp_hit', duration: 9000 }
+      rarity: 'epic', chartCondition: 'ok', result: 'tp_hit', duration: 9000 },
+
+    /* ---- Day 4 --------------------------------------------------------- */
+    { id: 31, day: 4, number: 1277, relativeTime: 4380,
+      pair: 'USDJPY', direction: 'long',  entry: 155.420, tp: 155.770, sl: 155.270,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 32, day: 4, number: 1278, relativeTime: 4470,
+      pair: 'BTCUSD', direction: 'short', entry: 67320.0, tp: 66970.0, sl: 67470.0,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 6600 },
+
+    { id: 33, day: 4, number: 1279, relativeTime: 4560,
+      pair: 'USDJPY', direction: 'short', entry: 158.610, tp: 158.300, sl: 158.740,
+      rarity: 'normal', chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 34, day: 4, number: 1280, relativeTime: 4650,
+      pair: 'BTCUSD', direction: 'long',  entry: 66510.0, tp: 66900.0, sl: 66360.0,
+      rarity: 'rare',   chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 35, day: 4, number: 1281, relativeTime: 4740,
+      pair: 'USDJPY', direction: 'long',  entry: 156.720, tp: 157.060, sl: 156.570,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 6600 },
+
+    { id: 36, day: 4, number: 1282, relativeTime: 4830,
+      pair: 'BTCUSD', direction: 'short', entry: 68740.0, tp: 68360.0, sl: 68910.0,
+      rarity: 'good',   chartCondition: 'ng', result: 'sl_hit', duration: 7200 },
+
+    { id: 37, day: 4, number: 1283, relativeTime: 4920,
+      pair: 'USDJPY', direction: 'short', entry: 154.810, tp: 154.520, sl: 154.930,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 38, day: 4, number: 1284, relativeTime: 5010,
+      pair: 'BTCUSD', direction: 'long',  entry: 65420.0, tp: 65820.0, sl: 65260.0,
+      rarity: 'normal', chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 39, day: 4, number: 1285, relativeTime: 5100,
+      pair: 'USDJPY', direction: 'long',  entry: 157.920, tp: 158.270, sl: 157.780,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 40, day: 4, number: 1286, relativeTime: 5190,
+      pair: 'BTCUSD', direction: 'long',  entry: 69220.0, tp: 69640.0, sl: 69050.0,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 6600 },
+
+    /* ---- Day 5 --------------------------------------------------------- */
+    { id: 41, day: 5, number: 1287, relativeTime: 5820,
+      pair: 'USDJPY', direction: 'short', entry: 159.380, tp: 159.060, sl: 159.510,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 42, day: 5, number: 1288, relativeTime: 5910,
+      pair: 'BTCUSD', direction: 'long',  entry: 64820.0, tp: 65240.0, sl: 64660.0,
+      rarity: 'good',   chartCondition: 'ng', result: 'sl_hit', duration: 7200 },
+
+    { id: 43, day: 5, number: 1289, relativeTime: 6000,
+      pair: 'USDJPY', direction: 'long',  entry: 153.620, tp: 153.960, sl: 153.470,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 6600 },
+
+    { id: 44, day: 5, number: 1290, relativeTime: 6090,
+      pair: 'BTCUSD', direction: 'short', entry: 66820.0, tp: 66470.0, sl: 66990.0,
+      rarity: 'rare',   chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 45, day: 5, number: 1291, relativeTime: 6180,
+      pair: 'USDJPY', direction: 'short', entry: 155.240, tp: 154.940, sl: 155.370,
+      rarity: 'normal', chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 46, day: 5, number: 1292, relativeTime: 6270,
+      pair: 'BTCUSD', direction: 'long',  entry: 67920.0, tp: 68350.0, sl: 67760.0,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 47, day: 5, number: 1293, relativeTime: 6360,
+      pair: 'USDJPY', direction: 'long',  entry: 156.510, tp: 156.860, sl: 156.360,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 48, day: 5, number: 1294, relativeTime: 6450,
+      pair: 'BTCUSD', direction: 'short', entry: 65210.0, tp: 64820.0, sl: 65390.0,
+      rarity: 'normal', chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 49, day: 5, number: 1295, relativeTime: 6540,
+      pair: 'USDJPY', direction: 'short', entry: 158.820, tp: 158.510, sl: 158.960,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 50, day: 5, number: 1296, relativeTime: 6630,
+      pair: 'BTCUSD', direction: 'long',  entry: 66330.0, tp: 66730.0, sl: 66170.0,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 6600 },
+
+    /* ---- Day 6 --------------------------------------------------------- */
+    { id: 51, day: 6, number: 1297, relativeTime: 7260,
+      pair: 'USDJPY', direction: 'long',  entry: 154.120, tp: 154.480, sl: 153.960,
+      rarity: 'rare',   chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 52, day: 6, number: 1298, relativeTime: 7350,
+      pair: 'BTCUSD', direction: 'short', entry: 68510.0, tp: 68140.0, sl: 68680.0,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 6600 },
+
+    { id: 53, day: 6, number: 1299, relativeTime: 7440,
+      pair: 'USDJPY', direction: 'short', entry: 157.220, tp: 156.910, sl: 157.360,
+      rarity: 'normal', chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 54, day: 6, number: 1300, relativeTime: 7530,
+      pair: 'BTCUSD', direction: 'long',  entry: 65920.0, tp: 66340.0, sl: 65760.0,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 55, day: 6, number: 1301, relativeTime: 7620,
+      pair: 'USDJPY', direction: 'long',  entry: 156.830, tp: 157.180, sl: 156.680,
+      rarity: 'good',   chartCondition: 'ng', result: 'sl_hit', duration: 7200 },
+
+    { id: 56, day: 6, number: 1302, relativeTime: 7710,
+      pair: 'BTCUSD', direction: 'short', entry: 67420.0, tp: 67020.0, sl: 67600.0,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 57, day: 6, number: 1303, relativeTime: 7800,
+      pair: 'USDJPY', direction: 'short', entry: 159.620, tp: 159.310, sl: 159.760,
+      rarity: 'rare',   chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 58, day: 6, number: 1304, relativeTime: 7890,
+      pair: 'BTCUSD', direction: 'long',  entry: 64620.0, tp: 65050.0, sl: 64450.0,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 59, day: 6, number: 1305, relativeTime: 7980,
+      pair: 'USDJPY', direction: 'long',  entry: 155.510, tp: 155.860, sl: 155.360,
+      rarity: 'normal', chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 60, day: 6, number: 1306, relativeTime: 8070,
+      pair: 'BTCUSD', direction: 'short', entry: 68910.0, tp: 68520.0, sl: 69090.0,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    /* ---- Day 7 (最終日: Legendary シグナルで締め) ---------------------- */
+    { id: 61, day: 7, number: 1307, relativeTime: 8700,
+      pair: 'USDJPY', direction: 'long',  entry: 157.420, tp: 157.770, sl: 157.270,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 62, day: 7, number: 1308, relativeTime: 8790,
+      pair: 'BTCUSD', direction: 'long',  entry: 67220.0, tp: 67680.0, sl: 67040.0,
+      rarity: 'rare',   chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 63, day: 7, number: 1309, relativeTime: 8880,
+      pair: 'USDJPY', direction: 'short', entry: 154.330, tp: 154.030, sl: 154.460,
+      rarity: 'normal', chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 64, day: 7, number: 1310, relativeTime: 8970,
+      pair: 'BTCUSD', direction: 'short', entry: 69320.0, tp: 68920.0, sl: 69500.0,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 65, day: 7, number: 1311, relativeTime: 9060,
+      pair: 'USDJPY', direction: 'long',  entry: 158.120, tp: 158.470, sl: 157.970,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 6600 },
+
+    { id: 66, day: 7, number: 1312, relativeTime: 9150,
+      pair: 'BTCUSD', direction: 'long',  entry: 66120.0, tp: 66540.0, sl: 65960.0,
+      rarity: 'epic',   chartCondition: 'ok',  result: 'tp_hit', duration: 8400 },
+
+    { id: 67, day: 7, number: 1313, relativeTime: 9240,
+      pair: 'USDJPY', direction: 'short', entry: 156.920, tp: 156.610, sl: 157.060,
+      rarity: 'normal', chartCondition: 'ok',  result: 'tp_hit', duration: 7200 },
+
+    { id: 68, day: 7, number: 1314, relativeTime: 9330,
+      pair: 'BTCUSD', direction: 'short', entry: 65820.0, tp: 65420.0, sl: 66000.0,
+      rarity: 'good',   chartCondition: 'ng', result: 'sl_hit', duration: 6000 },
+
+    { id: 69, day: 7, number: 1315, relativeTime: 9420,
+      pair: 'USDJPY', direction: 'long',  entry: 155.720, tp: 156.080, sl: 155.570,
+      rarity: 'good',   chartCondition: 'ok',  result: 'tp_hit', duration: 7800 },
+
+    { id: 70, day: 7, number: 1316, relativeTime: 9510,
+      pair: 'BTCUSD', direction: 'long',  entry: 67820.0, tp: 68850.0, sl: 67350.0,
+      rarity: 'legendary', chartCondition: 'ok', result: 'tp_hit', duration: 9000 }
   ];
 
   /* --------------------------------------------------------------------------
@@ -405,7 +569,7 @@
   /* --------------------------------------------------------------------------
    * 6. SCENARIOS を組み立て
    * -------------------------------------------------------------------------- */
-  const SCENARIOS = { day1: [], day2: [], day3: [] };
+  const SCENARIOS = { day1: [], day2: [], day3: [], day4: [], day5: [], day6: [], day7: [] };
   for (let i = 0; i < SIGNAL_META.length; i++) {
     const signal = enrichSignal(SIGNAL_META[i]);
     SCENARIOS['day' + signal.day].push(signal);
@@ -414,10 +578,13 @@
   /* --------------------------------------------------------------------------
    * 7. ユーティリティ
    * -------------------------------------------------------------------------- */
-  const ALL_SIGNALS = SCENARIOS.day1.concat(SCENARIOS.day2, SCENARIOS.day3);
+  const ALL_SIGNALS = SCENARIOS.day1.concat(
+    SCENARIOS.day2, SCENARIOS.day3, SCENARIOS.day4,
+    SCENARIOS.day5, SCENARIOS.day6, SCENARIOS.day7
+  );
 
   const ScenarioUtil = {
-    totalDays: 3,
+    totalDays: 7,
     totalSignals: ALL_SIGNALS.length,
 
     /** ID からシグナル取得 */
