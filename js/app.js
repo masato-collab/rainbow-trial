@@ -472,7 +472,15 @@
 
         '<div class="settings-section">' +
           '<div class="settings-section__title">ℹ️ アプリ情報</div>' +
-          '<div class="settings-info">バージョン: <strong>5.0.0</strong></div>' +
+          '<div class="settings-info">バージョン: <strong>5.1.0</strong></div>' +
+        '</div>' +
+
+        '<div class="settings-section">' +
+          '<button id="settings-install-btn" type="button" style="' +
+            'width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;' +
+            'background:linear-gradient(135deg,#9775FA,#4DABF7);' +
+            'color:#fff;font-size:0.95rem;font-weight:700;' +
+          '">📲 ホーム画面に追加する</button>' +
         '</div>' +
 
         '<div class="settings-section">' +
@@ -488,6 +496,16 @@
         '</div>';
 
       const self = this;
+      // インストールボタン
+      const instBtn = document.getElementById('settings-install-btn');
+      if (instBtn) {
+        instBtn.addEventListener('click', function () {
+          document.getElementById('overlay-settings').classList.remove('is-open');
+          setTimeout(function () {
+            if (global.InstallModal) global.InstallModal.show();
+          }, 200);
+        });
+      }
       // 通知 ON/OFF
       const enBox = document.getElementById('notif-enabled');
       if (enBox) enBox.addEventListener('change', async function () {

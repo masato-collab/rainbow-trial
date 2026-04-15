@@ -12,7 +12,12 @@
 
   var InstallBanner = {
     shouldShow: function () {
+      // インストール済み(standalone起動 or フラグあり)なら表示しない
       if (global.InstallDetector && global.InstallDetector.isInstalled()) return false;
+      // standalone メディアクエリ直接チェック
+      if (global.matchMedia && global.matchMedia('(display-mode: standalone)').matches) return false;
+      if (global.navigator && global.navigator.standalone === true) return false;
+      // 24時間以内に × で閉じた場合は表示しない
       var dismissedAt = localStorage.getItem(DISMISS_KEY);
       if (dismissedAt) {
         var elapsed = Date.now() - parseInt(dismissedAt, 10);

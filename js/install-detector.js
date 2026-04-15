@@ -19,7 +19,9 @@
 
     /** インストール済みと判断できるか */
     isInstalled: function () {
-      return localStorage.getItem(INSTALLED_KEY) === 'true' || this.isStandalone();
+      // standalone 起動中かフラグが立っている場合のみ true
+      if (this.isStandalone()) return true;
+      return localStorage.getItem(INSTALLED_KEY) === 'true';
     },
 
     /** インストール完了イベントを購読してフラグを立てる */
