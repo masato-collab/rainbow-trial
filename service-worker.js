@@ -14,7 +14,7 @@
  *   - CACHE_NAME を変更すると古いキャッシュを activate で一掃
  * ========================================================================== */
 
-const CACHE_VERSION = 'v4.0.0-20260416p4';
+const CACHE_VERSION = 'v5.0.0-20260416p5';
 const CACHE_NAME    = 'rainbow-trial-' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -41,10 +41,15 @@ const PRECACHE_URLS = [
   'data/master-messages.js',
   'data/members-feed.js',
   'css/phase4.css',
+  'css/finale.css',
   'js/master-message.js',
   'js/members-feed.js',
+  'js/result-card.js',
   'js/final-screen.js',
   'js/phase4-hooks.js',
+  'assets/master/hikari-avatar.svg',
+  'terms.html',
+  'privacy.html',
   'assets/logo.svg',
   'assets/favicon.svg',
   'assets/favicon-alert.svg',

@@ -517,7 +517,19 @@
 
         '<div class="settings-section">' +
           '<div class="settings-section__title">ℹ️ アプリ情報</div>' +
-          '<div class="settings-info">バージョン: <strong>4.0.0</strong></div>' +
+          '<div class="settings-info">バージョン: <strong>5.0.0</strong></div>' +
+        '</div>' +
+
+        '<div class="settings-section">' +
+          '<a href="https://lin.ee/xGQTHY1" target="_blank" rel="noopener" class="settings-line-link">' +
+            'ひかりに相談する' +
+          '</a>' +
+        '</div>' +
+
+        '<div class="settings-section" style="display:flex;gap:12px;font-size:0.75rem;justify-content:center;opacity:0.4">' +
+          '<a href="terms.html" target="_blank" style="color:inherit">利用規約</a>' +
+          '<span>|</span>' +
+          '<a href="privacy.html" target="_blank" style="color:inherit">プライバシーポリシー</a>' +
         '</div>';
 
       const self = this;
@@ -832,7 +844,7 @@
       // 学習リンク
       html +=
         '<div class="card card--compact" id="learn-link-card" role="button" tabindex="0" style="cursor:pointer; text-align:center; margin: var(--sp-4) 0;">' +
-          '<strong>📚 条件の見方を確認する</strong>' +
+          '<strong>📚 レインボーロードの見方を確認する</strong>' +
         '</div>';
 
       // Phase 3: 最近の実績(最後に解除した3個)
@@ -1421,7 +1433,7 @@
           '<div style="margin-top: var(--sp-3); font-size:.88rem;">' +
             '<strong>現在の判定: </strong>' + global.Judgment.briefHint(j) +
           '</div>' +
-          '<a href="#" class="guide__link" id="detail-open-learn">🎓 条件の見方を詳しく見る</a>' +
+          '<a href="#" class="guide__link" id="detail-open-learn">🎓 レインボーロードの見方を詳しく見る</a>' +
         '</section>' +
 
         '<div class="decision">' +

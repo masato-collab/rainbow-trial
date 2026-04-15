@@ -167,8 +167,7 @@
       const el = document.createElement('div');
       el.className = 'chart__legend chart__legend--mt4';
       el.innerHTML =
-        '<div class="chart__legend-row" style="color:#FFD54F">Moving Average(20)</div>' +
-        '<div class="chart__legend-row" style="color:#29B6F6">Moving Average(80)</div>';
+        '<div class="chart__legend-row" style="color:#FFD54F">🌈 レインボーロード</div>';
       this.container.appendChild(el);
     }
 

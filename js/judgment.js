@@ -2,9 +2,11 @@
  * Rainbow Trial — js/judgment.js
  * シグナルの「エントリー条件」判定ロジック + 学習ガイド文生成。
  *
- * 判定ルール(Rainbow System 風の簡易版):
- *   LONG  : 最新ローソクの終値 > MA20 > MA80
- *   SHORT : 最新ローソクの終値 < MA20 < MA80
+ * 判定ルール(レインボーロード基準):
+ *   LONG  : ローソク足がレインボーロードの【上】を走っている
+ *             (内部: close > ma20 > ma80)
+ *   SHORT : ローソク足がレインボーロードの【下】を走っている
+ *             (内部: close < ma20 < ma80)
  *
  * 公開グローバル: window.Judgment
  * ========================================================================== */
@@ -50,29 +52,29 @@
   function buildChecks(direction, close, ma20, ma80) {
     if (direction === 'long') {
       return [
-        { label: '終値が MA20 の上',    pass: close > ma20, detail: close.toFixed(3) + ' > ' + ma20.toFixed(3) },
-        { label: 'MA20 が MA80 の上',   pass: ma20  > ma80, detail: ma20.toFixed(3)  + ' > ' + ma80.toFixed(3) }
+        { label: 'ローソク足がレインボーロードの上にある',  pass: close > ma20, detail: close.toFixed(3) + ' > ' + ma20.toFixed(3) },
+        { label: 'レインボーロードが正しい方向に並んでいる', pass: ma20  > ma80, detail: ma20.toFixed(3)  + ' > ' + ma80.toFixed(3) }
       ];
     }
     // short
     return [
-      { label: '終値が MA20 の下',      pass: close < ma20, detail: close.toFixed(3) + ' < ' + ma20.toFixed(3) },
-      { label: 'MA20 が MA80 の下',     pass: ma20  < ma80, detail: ma20.toFixed(3)  + ' < ' + ma80.toFixed(3) }
+      { label: 'ローソク足がレインボーロードの下にある',  pass: close < ma20, detail: close.toFixed(3) + ' < ' + ma20.toFixed(3) },
+      { label: 'レインボーロードが正しい方向に並んでいる', pass: ma20  < ma80, detail: ma20.toFixed(3)  + ' < ' + ma80.toFixed(3) }
     ];
   }
 
   function describeNg(direction, close, ma20, ma80) {
     if (direction === 'long') {
-      if (close < ma80 && close < ma20) return '価格がまだ下落トレンド圏にあります。';
-      if (close < ma20) return '価格が MA20 の下にあります(押し目待ち)。';
-      if (ma20 < ma80)  return 'MA20 が MA80 の下で推移しています(長期の下落傾向)。';
-      return 'MA の並びがロング条件を満たしていません。';
+      if (close < ma80 && close < ma20) return 'ローソク足がレインボーロードの下を走っています。';
+      if (close < ma20) return 'ローソク足がレインボーロードに絡んでいます(条件NG)。';
+      if (ma20 < ma80)  return 'レインボーロードの向きが逆転しています(下落傾向)。';
+      return 'レインボーロードの並びがロング条件を満たしていません。';
     }
     // short
-    if (close > ma80 && close > ma20) return '価格がまだ上昇トレンド圏にあります。';
-    if (close > ma20) return '価格が MA20 の上にあります(戻り待ち)。';
-    if (ma20 > ma80)  return 'MA20 が MA80 の上で推移しています(長期の上昇傾向)。';
-    return 'MA の並びがショート条件を満たしていません。';
+    if (close > ma80 && close > ma20) return 'ローソク足がレインボーロードの上を走っています。';
+    if (close > ma20) return 'ローソク足がレインボーロードに絡んでいます(条件NG)。';
+    if (ma20 > ma80)  return 'レインボーロードの向きが逆転しています(上昇傾向)。';
+    return 'レインボーロードの並びがショート条件を満たしていません。';
   }
 
   /* --------------------------------------------------------------------------
@@ -81,20 +83,20 @@
   function getGuideText(direction) {
     if (direction === 'long') {
       return {
-        title: '💡 ロングシグナルの条件',
+        title: '🌈 レインボーロードを確認',
         lines: [
-          'ローソク足の <strong>下</strong> に MA20 があり、',
-          'さらにその <strong>下</strong> に MA80 がある状態。',
-          'つまり <strong>終値 &gt; MA20 &gt; MA80</strong> ならエントリー OK ✅'
+          'レインボーロードの <strong>上</strong> をローソク足が走っていれば OK。',
+          '<span style="font-family:monospace;font-size:0.9em">▮▮▮ ← ローソク足<br>━━━ ← レインボーロード</span>',
+          'ローソク足がレインボーロードの上を走っていれば エントリー OK ✅'
         ]
       };
     }
     return {
-      title: '💡 ショートシグナルの条件',
+      title: '🌈 レインボーロードを確認',
       lines: [
-        'ローソク足の <strong>上</strong> に MA20 があり、',
-        'さらにその <strong>上</strong> に MA80 がある状態。',
-        'つまり <strong>終値 &lt; MA20 &lt; MA80</strong> ならエントリー OK ✅'
+        'レインボーロードの <strong>下</strong> をローソク足が走っていれば OK。',
+        '<span style="font-family:monospace;font-size:0.9em">━━━ ← レインボーロード<br>▮▮▮ ← ローソク足</span>',
+        'ローソク足がレインボーロードの下を走っていれば エントリー OK ✅'
       ]
     };
   }
@@ -107,8 +109,8 @@
     if (!judgeResult) return '';
     if (judgeResult.condition === 'ok') {
       return judgeResult.rule === 'long'
-        ? '終値 &gt; MA20 &gt; MA80 の並び。ロング条件成立。'
-        : '終値 &lt; MA20 &lt; MA80 の並び。ショート条件成立。';
+        ? 'ローソク足がレインボーロードの上を走っています。ロング条件成立。'
+        : 'ローソク足がレインボーロードの下を走っています。ショート条件成立。';
     }
     return judgeResult.ngReason || '条件を満たしていません。';
   }
@@ -119,37 +121,38 @@
   function getLearningContent() {
     return [
       {
-        title: 'Rainbow System とは',
+        title: 'レインボーロードとは',
         body:
-          '2 本の移動平均線(<strong>MA20</strong>・<strong>MA80</strong>)とローソク足の位置関係だけで、' +
-          'トレンドの方向と勢いを判断する、シンプルな半裁量システムです。'
+          'チャート上に表示される <strong>2 本のライン</strong>(短期・中期)の帯のことです。<br>' +
+          'ローソク足とこのレインボーロードの位置関係だけで、' +
+          'トレンドの方向と勢いを判断するのが Rainbow System の基本です。'
       },
       {
         title: 'ロングのエントリー条件',
         body:
-          '<strong>終値 &gt; MA20 &gt; MA80</strong> の順に並んでいる時。<br>' +
-          '「短期の勢い(MA20)」が「中期の流れ(MA80)」よりも上、かつ価格がその両方より上にある = ' +
-          '買い方が有利な地合い、と判断します。'
+          'ローソク足が<strong>レインボーロードの上</strong>を走っている時。<br>' +
+          'レインボーロードが正しい向き(短期ラインが中期ラインより上)に並んでおり、' +
+          'かつローソク足がその上にある = 買い方が有利な地合い、と判断します。'
       },
       {
         title: 'ショートのエントリー条件',
         body:
-          '<strong>終値 &lt; MA20 &lt; MA80</strong> の順に並んでいる時。<br>' +
-          'ロングの逆で、売り方が有利な地合いです。'
+          'ローソク足が<strong>レインボーロードの下</strong>を走っている時。<br>' +
+          'ロングとは逆で、レインボーロードが下向きに並んでいる = 売り方が有利な地合いです。'
       },
       {
         title: '見送るべきケース',
         body:
-          '・価格が MA20 と MA80 の<strong>間</strong>にある<br>' +
-          '・MA20 と MA80 が<strong>逆の並び</strong>(MA80 の下に MA20)<br>' +
-          '・どちらも価格の反対側にある<br>' +
+          '・ローソク足がレインボーロードに<strong>絡んでいる</strong>(間にある)<br>' +
+          '・レインボーロードの向きが<strong>逆転</strong>している<br>' +
+          '・価格がレインボーロードの反対側から戻りかけている<br>' +
           'これらはトレンドが不明瞭 or 逆行の可能性があるため、見送るのが賢明です。'
       },
       {
         title: 'TP / SL の考え方',
         body:
           'TP(利確)と SL(損切)は、シグナル配信時に自動計算されます。<br>' +
-          '推奨 <strong>RR 比 = 1 : 2.0 以上</strong> を基準に、勝率を維持しながら期待値をプラスに保つ設計です。'
+          '推奨 <strong>RR 比 = 1 : 1.6 以上</strong> を基準に、勝率を維持しながら期待値をプラスに保つ設計です。'
       }
     ];
   }

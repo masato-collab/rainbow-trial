@@ -130,7 +130,24 @@
           reduced: false
         }
       },
-      lastActiveTime: null     // 最終アクティブ時刻(ISO)
+      lastActiveTime: null,    // 最終アクティブ時刻(ISO)
+      // Phase 4 追加
+      masterMessages: {
+        shown:     {},   // { id: isoStr }
+        unreadIds: [],
+        history:   []
+      },
+      day7Completion: {
+        isCompleted: false,
+        completedAt: null,
+        finalRank:   null,
+        finalScore:  null,
+        finalStats:  null
+      },
+      ctaInteractions: {
+        lineButtonClicked:     0,
+        resultCardDownloaded:  0
+      }
     };
   }
 
@@ -176,20 +193,31 @@
     // Phase 3 新規フィールド: missions
     merged.missions = Object.assign({}, data.missions || {});
 
-    // 既存フィールド
-    // Phase 4: settings.masterMessageShown / _lastKnownDay / _finalScreenAutoShown を保持
-    if (data.settings && data.settings.masterMessageShown) {
-      merged.settings.masterMessageShown = Object.assign(
-        {}, merged.settings.masterMessageShown || {},
-        data.settings.masterMessageShown
-      );
+    // Phase 4: 設定フィールド保持
+    var oldS = data.settings || {};
+    if (oldS._lastKnownDay)         merged.settings._lastKnownDay         = oldS._lastKnownDay;
+    if (oldS._finalScreenAutoShown) merged.settings._finalScreenAutoShown = oldS._finalScreenAutoShown;
+    if (oldS._lineBannerDismissed)  merged.settings._lineBannerDismissed  = oldS._lineBannerDismissed;
+    // 旧 masterMessageShown → 新 hikari.shown へ移行
+    if (oldS.masterMessageShown) {
+      merged.settings.hikari = merged.settings.hikari || { shown: {}, unreadIds: [], history: [] };
+      Object.keys(oldS.masterMessageShown).forEach(function (k) {
+        merged.settings.hikari.shown[k] = merged.settings.hikari.shown[k] || new Date().toISOString();
+      });
     }
-    if (data.settings && data.settings._lastKnownDay) {
-      merged.settings._lastKnownDay = data.settings._lastKnownDay;
+    // 新形式の hikari 設定を保持
+    if (oldS.hikari) {
+      merged.settings.hikari = {
+        shown:     Object.assign({}, (merged.settings.hikari && merged.settings.hikari.shown) || {}, oldS.hikari.shown || {}),
+        unreadIds: oldS.hikari.unreadIds || [],
+        history:   oldS.hikari.history   || []
+      };
     }
-    if (data.settings && data.settings._finalScreenAutoShown) {
-      merged.settings._finalScreenAutoShown = data.settings._finalScreenAutoShown;
-    }
+
+    // Phase 4: day7Completion / ctaInteractions 保持
+    merged.day7Completion   = Object.assign({}, init.day7Completion,   data.day7Completion   || {});
+    merged.ctaInteractions  = Object.assign({}, init.ctaInteractions,  data.ctaInteractions  || {});
+    merged.masterMessages   = Object.assign({}, init.masterMessages,   data.masterMessages   || {});
 
     merged.trades         = Array.isArray(data.trades)  ? data.trades.slice()  : [];
     merged.signals        = Array.isArray(data.signals) ? data.signals.slice() : [];
@@ -230,10 +258,16 @@
     return load() || createInitialState();
   }
 
-  /** 浅いマージで更新(ネストは呼び出し側で組み立て) */
+  /**
+   * 部分マージで更新。
+   * settings は深くマージ(既存の sound/animations 等が上書きされないように)
+   */
   function setState(partial) {
     const cur = getState();
     const next = Object.assign({}, cur, partial);
+    if (partial && partial.settings) {
+      next.settings = Object.assign({}, cur.settings || {}, partial.settings);
+    }
     save(next);
     return next;
   }

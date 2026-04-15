@@ -1,0 +1,514 @@
+/* ==========================================================================
+ * Rainbow Trial — css/finale.css
+ * Day 7 フィナーレ画面スタイル
+ * ========================================================================== */
+
+/* ==========================================================================
+   1. フィナーレオーバーレイ
+   ========================================================================== */
+
+.finale-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  background: #06061A;
+  overflow-y: scroll; /* iOS Safari は auto ではなく scroll */
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.finale-overlay--enter {
+  opacity: 1;
+}
+
+.finale-overlay--exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   2. シーン共通
+   ========================================================================== */
+
+.finale-scene {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  position: relative;
+}
+
+.finale-scene--opening {
+  background: radial-gradient(ellipse at center, #1A0A3E 0%, #06061A 70%);
+}
+
+/* ==========================================================================
+   3. オープニングシーン
+   ========================================================================== */
+
+.finale-opening__rainbow {
+  font-size: 5rem;
+  line-height: 1;
+  margin-bottom: 32px;
+  animation: finale-bounce 1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.finale-opening__tag {
+  font-size: 0.78rem;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  animation: finale-fadein 0.8s 0.5s ease both;
+}
+
+.finale-opening__title {
+  font-size: 2.4rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #9775FA, #38BDF8, #34D399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  animation: finale-fadein 0.8s 0.8s ease both;
+}
+
+.finale-opening__days {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 16px;
+  animation: finale-fadein 0.8s 1.1s ease both;
+}
+
+.finale-opening__skip {
+  position: absolute;
+  bottom: 32px;
+  right: 24px;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+/* ==========================================================================
+   4. 成績発表シーン
+   ========================================================================== */
+
+.finale-stats {
+  max-width: 480px;
+  width: 100%;
+}
+
+.finale-section-title {
+  font-size: 0.8rem;
+  letter-spacing: 3px;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.finale-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.finale-stat-item {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 18px 14px;
+  animation: finale-slideup 0.5s ease both;
+}
+
+.finale-stat-item:nth-child(1) { animation-delay: 0.1s; }
+.finale-stat-item:nth-child(2) { animation-delay: 0.2s; }
+.finale-stat-item:nth-child(3) { animation-delay: 0.3s; }
+.finale-stat-item:nth-child(4) { animation-delay: 0.4s; }
+
+.finale-stat-item__label {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.finale-stat-item__value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.finale-stat-item__unit {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.4);
+  margin-left: 2px;
+}
+
+/* ==========================================================================
+   5. ランクバッジシーン
+   ========================================================================== */
+
+.finale-rank-section {
+  max-width: 360px;
+  width: 100%;
+}
+
+.finale-rank-badge {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 6px solid #9775FA;
+  background: rgba(0,0,0,0.4);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  transform: scale(0) rotate(-20deg);
+  opacity: 0;
+  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+              opacity   0.4s ease,
+              box-shadow 0.7s ease;
+}
+
+.finale-rank-badge--reveal {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+  box-shadow: 0 0 60px currentColor, 0 0 120px rgba(151,117,250,0.25);
+}
+
+.finale-rank-badge__icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.finale-rank-badge__label {
+  font-size: 2.4rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-top: 4px;
+}
+
+.finale-rank-badge__title {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.55);
+  margin-top: 4px;
+}
+
+.finale-rank-score {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.55);
+}
+
+.finale-rank-score strong {
+  color: #9775FA;
+  font-size: 1.3rem;
+}
+
+/* ==========================================================================
+   6. グラフシーン
+   ========================================================================== */
+
+.finale-chart-section {
+  max-width: 480px;
+  width: 100%;
+}
+
+.finale-chart-label {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.45);
+  text-align: left;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.finale-chart-wrap {
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  height: 160px;
+  margin-bottom: 12px;
+}
+
+.finale-chart-wrap canvas {
+  display: block;
+  width: 100%;
+  height: 160px;
+}
+
+/* ==========================================================================
+   7. 実績シーン
+   ========================================================================== */
+
+.finale-ach-section {
+  max-width: 480px;
+  width: 100%;
+}
+
+.finale-ach-summary {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.65);
+  margin-bottom: 20px;
+}
+
+.finale-ach-summary strong {
+  color: #FFD700;
+  font-size: 1.2rem;
+}
+
+.finale-ach-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.finale-ach-badge {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 100px;
+  padding: 5px 12px;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.7);
+  opacity: 0;
+  transform: scale(0.8);
+  animation: finale-popin 0.4s ease both;
+}
+
+/* ==========================================================================
+   8. ひかりメッセージシーン
+   ========================================================================== */
+
+.finale-hikari {
+  max-width: 480px;
+  width: 100%;
+}
+
+.finale-hikari__avatar-wrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+}
+
+.finale-hikari__avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: block;
+}
+
+.finale-hikari__avatar-ring {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: conic-gradient(#FF0080, #FF8C00, #FFD700, #00FF87, #00BFFF, #A855F7, #FF0080);
+  z-index: -1;
+  animation: finale-spin 4s linear infinite;
+}
+
+.finale-hikari__name {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.finale-hikari__body {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.finale-hikari__body p {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.85;
+  margin: 0;
+}
+
+.finale-hikari__body p + p {
+  margin-top: 8px;
+}
+
+.finale-hikari__body p:empty {
+  margin-top: 4px;
+}
+
+.finale-hikari__from {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.35);
+  text-align: right;
+  margin-top: 14px;
+  font-style: italic;
+}
+
+/* LINE CTA */
+.finale-line-cta {
+  margin-bottom: 16px;
+}
+
+.btn--line-finale {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: #06C755;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 1.05rem;
+  border: none;
+  border-radius: 14px;
+  padding: 18px 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  min-height: 60px;
+}
+
+@media (hover: hover) {
+  .btn--line-finale:hover { background: #05A83E; }
+}
+
+.btn--line-finale:active { transform: scale(0.98); }
+
+.btn--line-finale__icon {
+  font-size: 1.3rem;
+  font-weight: 900;
+  font-style: normal;
+  background: #fff;
+  color: #06C755;
+  border-radius: 6px;
+  padding: 2px 6px;
+  line-height: 1;
+}
+
+/* 結果カード保存 */
+.finale-download-btn {
+  width: 100%;
+  background: rgba(151,117,250,0.12);
+  color: #9775FA;
+  border: 1.5px solid rgba(151,117,250,0.35);
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 16px;
+  min-height: 54px;
+}
+
+@media (hover: hover) {
+  .finale-download-btn:hover { background: rgba(151,117,250,0.22); }
+}
+
+/* ホームに戻る */
+.finale-home-btn {
+  width: 100%;
+  background: transparent;
+  color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  min-height: 50px;
+}
+
+@media (hover: hover) {
+  .finale-home-btn:hover {
+    color: rgba(255,255,255,0.7);
+    border-color: rgba(255,255,255,0.3);
+  }
+}
+
+/* ==========================================================================
+   9. ナビゲーションドット
+   ========================================================================== */
+
+.finale-nav-dots {
+  position: fixed;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 12100;
+}
+
+.finale-nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.finale-nav-dot--active {
+  background: #9775FA;
+  transform: scale(1.4);
+}
+
+/* ==========================================================================
+   10. アニメーション
+   ========================================================================== */
+
+@keyframes finale-bounce {
+  0%   { transform: scale(0.2); opacity: 0; }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes finale-fadein {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes finale-slideup {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes finale-popin {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes finale-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   11. prefers-reduced-motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .finale-overlay { transition: none; }
+  .finale-opening__rainbow,
+  .finale-opening__tag,
+  .finale-opening__title,
+  .finale-opening__days { animation: none !important; opacity: 1 !important; }
+  .finale-rank-badge { transition: none !important; transform: scale(1) !important; opacity: 1 !important; }
+  .finale-stat-item,
+  .finale-ach-badge { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .finale-hikari__avatar-ring { animation: none; }
+}

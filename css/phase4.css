@@ -1,634 +1,522 @@
 /* ==========================================================================
  * Rainbow Trial — css/phase4.css
- * Phase 4: マスターメッセージ / メンバーフィード / 最終画面 / シェア
+ * Phase 4: ひかりメッセージ / Rainbow Salon フィード / CTA バナー
  * ========================================================================== */
 
 /* ==========================================================================
-   1. マスターメッセージモーダル
+   1. ひかりメッセージ — ホームカード
    ========================================================================== */
 
-.master-msg-overlay {
+.hikari-card {
+  margin: var(--sp-4) 0;
+  border: 1px solid rgba(151, 117, 250, 0.25);
+  background: rgba(151, 117, 250, 0.06);
+  position: relative;
+  overflow: visible;
+}
+
+.hikari-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.hikari-card__icon {
+  font-size: 1rem;
+}
+
+.hikari-card__title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.hikari-card__badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #9775FA;
+  background: rgba(151, 117, 250, 0.2);
+  border-radius: 100px;
+  padding: 2px 8px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.hikari-card__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.hikari-card__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hikari-card__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+}
+
+.hikari-card__unread-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background: #9775FA;
+  border-radius: 50%;
+  border: 2px solid var(--bg-card);
+  animation: hikari-pulse 1.4s ease infinite;
+}
+
+@keyframes hikari-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.3); opacity: 0.7; }
+}
+
+.hikari-card__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.hikari-card__name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #9775FA;
+  margin-bottom: 3px;
+}
+
+.hikari-card__subject {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hikari-card__preview {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hikari-card__read-btn {
+  background: none;
+  border: 1px solid rgba(151, 117, 250, 0.35);
+  color: #9775FA;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: background 0.2s;
+  min-height: 40px;
+}
+
+@media (hover: hover) {
+  .hikari-card__read-btn:hover { background: rgba(151, 117, 250, 0.12); }
+}
+
+/* ==========================================================================
+   2. ひかりメッセージ — モーダル
+   ========================================================================== */
+
+.hikari-overlay {
   display: flex;
   align-items: center;
   justify-content: center;
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   opacity: 0;
   transition: opacity 0.35s ease;
+  padding: 20px;
 }
 
-.master-msg-overlay--enter {
-  opacity: 1;
-}
+.hikari-overlay--enter  { opacity: 1; }
+.hikari-overlay--leave  { opacity: 0; pointer-events: none; }
 
-.master-msg-overlay--leave {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.master-msg-card {
+.hikari-overlay__card {
   position: relative;
   background: var(--bg-card);
   border-radius: 20px;
   padding: 28px 24px 24px;
-  max-width: 360px;
-  width: calc(100% - 32px);
+  max-width: 380px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid rgba(151, 117, 250, 0.3);
-  box-shadow: 0 0 40px rgba(151, 117, 250, 0.25);
-  text-align: center;
-  transform: translateY(20px) scale(0.96);
+  box-shadow: 0 0 50px rgba(151, 117, 250, 0.2);
+  transform: translateY(24px) scale(0.96);
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.master-msg-overlay--enter .master-msg-card {
+.hikari-overlay--enter .hikari-overlay__card {
   transform: translateY(0) scale(1);
 }
 
-.master-msg-overlay--special .master-msg-card {
-  border-color: rgba(255, 215, 0, 0.4);
-  box-shadow: 0 0 40px rgba(255, 215, 0, 0.2);
+.hikari-modal__header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
-.master-msg__badge {
-  display: inline-block;
-  font-size: 0.72rem;
+.hikari-modal__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.hikari-modal__badge {
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.8px;
   color: #9775FA;
   background: rgba(151, 117, 250, 0.15);
   border-radius: 100px;
   padding: 3px 10px;
-  margin-bottom: 14px;
+  margin-bottom: 4px;
+  display: inline-block;
 }
 
-.master-msg__avatar {
-  font-size: 2.8rem;
-  line-height: 1;
-  margin-bottom: 10px;
-  display: block;
-}
-
-.master-msg__title {
-  font-size: 1.15rem;
+.hikari-modal__name {
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 14px;
+}
+
+.hikari-modal__subject {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
   line-height: 1.4;
 }
 
-.master-msg__body {
+.hikari-modal__body {
+  margin-bottom: 16px;
+}
+
+.hikari-modal__body p {
   font-size: 0.9rem;
   color: var(--text-secondary);
-  line-height: 1.8;
-  margin-bottom: 14px;
-  text-align: left;
+  line-height: 1.85;
+  margin: 0;
 }
 
-.master-msg__tips {
-  background: rgba(151, 117, 250, 0.08);
+.hikari-modal__body p + p {
+  margin-top: 6px;
+}
+
+.hikari-modal__line-hint {
+  background: rgba(6, 199, 85, 0.08);
+  border: 1px solid rgba(6, 199, 85, 0.2);
   border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  text-align: left;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  text-align: center;
 }
 
-.master-msg__tip {
+.hikari-modal__line-link {
   font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  padding: 2px 0;
+  color: #06C755;
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.master-msg__from {
-  font-size: 0.82rem;
+.hikari-modal__from {
+  font-size: 0.8rem;
   color: var(--text-muted);
+  text-align: right;
   margin-bottom: 16px;
   font-style: italic;
-  text-align: right;
 }
 
-.master-msg__close {
+/* 閉じるボタン */
+.hikari-modal__close {
   width: 100%;
+  min-height: 48px;
 }
 
 /* ==========================================================================
-   2. メンバーフィード
+   3. ひかりメッセージ — 履歴
    ========================================================================== */
 
-.feed-card {
-  margin: var(--sp-4) 0;
+.hikari-overlay__card--history {
+  max-width: 400px;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
 }
 
-.feed-card__header {
+.hikari-history__head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
 }
 
-.feed-card__icon {
-  font-size: 1.1rem;
-}
-
-.feed-card__title {
+.hikari-history__title {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text-primary);
   flex: 1;
 }
 
-.feed-card__live {
+.hikari-history__close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+.hikari-history__list {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  padding: 8px 0;
+}
+
+.hikari-history__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+
+@media (hover: hover) {
+  .hikari-history__item:hover { background: rgba(255,255,255,0.04); }
+}
+
+.hikari-history__item--unread {
+  background: rgba(151, 117, 250, 0.06);
+}
+
+.hikari-history__item-badge {
   font-size: 0.7rem;
+  color: #9775FA;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.hikari-history__item-subject {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hikari-history__dot {
+  width: 8px;
+  height: 8px;
+  background: #9775FA;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.hikari-history__empty {
+  padding: 24px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   4. Rainbow Salon ライブフィード
+   ========================================================================== */
+
+.salon-feed-card {
+  margin: var(--sp-4) 0;
+}
+
+.salon-feed__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.salon-feed__icon { font-size: 1.1rem; }
+
+.salon-feed__title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.salon-feed__live {
+  font-size: 0.68rem;
   color: #10B981;
   font-weight: 700;
-  animation: blink-live 1.5s ease infinite;
+  animation: salon-blink 1.5s ease infinite;
 }
 
-@keyframes blink-live {
+@keyframes salon-blink {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.4; }
+  50%       { opacity: 0.35; }
 }
 
-.feed-card__list {
+.salon-feed__list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
-.feed-item {
+.salon-feed__item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   padding: 8px 10px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border-left: 3px solid rgba(255, 255, 255, 0.08);
-  transition: transform 0.3s ease, opacity 0.3s ease;
+  background: rgba(255,255,255,0.03);
+  border-left: 3px solid rgba(255,255,255,0.08);
+  transition: transform 0.35s ease, opacity 0.35s ease;
 }
 
-.feed-item--new {
-  opacity: 0;
-  transform: translateY(-8px);
-}
+.salon-feed__item--new   { opacity: 0; transform: translateY(-10px); }
+.salon-feed__item--enter { opacity: 1; transform: translateY(0); }
+.salon-feed__item--win   { border-left-color: rgba(52, 211, 153, 0.55); }
+.salon-feed__item--lose  { border-left-color: rgba(239, 68, 68, 0.45); }
 
-.feed-item--enter {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.feed-item--good      { border-left-color: rgba(74, 222, 128, 0.5); }
-.feed-item--rare      { border-left-color: rgba(59, 130, 246, 0.6); }
-.feed-item--epic      { border-left-color: rgba(168, 85, 247, 0.7); }
-.feed-item--legendary { border-left-color: rgba(250, 204, 21, 0.8); background: rgba(250, 204, 21, 0.04); }
-
-.feed-item__avatar {
+.salon-feed__avatar {
   font-size: 1.3rem;
   line-height: 1;
   flex-shrink: 0;
   margin-top: 2px;
 }
 
-.feed-item__body {
-  flex: 1;
-  min-width: 0;
+.salon-feed__body   { flex: 1; min-width: 0; }
+
+.salon-feed__member {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
 }
 
-.feed-item__msg {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.45;
-  word-break: break-word;
+.salon-feed__name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-.feed-item__time {
-  font-size: 0.72rem;
+.salon-feed__pips--win  { font-size: 0.82rem; font-weight: 700; color: #34D399; }
+.salon-feed__pips--lose { font-size: 0.82rem; font-weight: 700; color: #F87171; }
+
+.salon-feed__detail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.salon-feed__time {
+  font-size: 0.7rem;
   color: var(--text-muted);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* ==========================================================================
-   3. Day 7 最終画面
-   ========================================================================== */
-
-.final-screen-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  background: linear-gradient(160deg, #0A0A1A 0%, #12122A 50%, #0A0A1A 100%);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  opacity: 0;
-  transition: opacity 0.5s ease;
+.salon-feed__footer {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255,255,255,0.06);
 }
 
-.final-screen-overlay--enter {
-  opacity: 1;
-}
-
-.final-screen {
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 48px 20px 80px;
-  text-align: center;
-}
-
-/* ヘッダー */
-.final-screen__header {
-  margin-bottom: 32px;
-}
-
-.final-screen__logo {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.4);
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-}
-
-.final-screen__title {
-  font-size: 1.8rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #9775FA, #38BDF8, #34D399);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 8px;
-  line-height: 1.2;
-}
-
-.final-screen__subtitle {
-  font-size: 0.95rem;
-  color: rgba(255,255,255,0.6);
-}
-
-/* ランクバッジ */
-.final-rank-section {
-  margin-bottom: 32px;
-}
-
-.final-rank-badge {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 4px solid #9775FA;
-  background: rgba(0, 0, 0, 0.4);
-  margin: 0 auto 12px;
-  transform: scale(0.5);
-  opacity: 0;
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
-              opacity 0.4s ease,
-              box-shadow 0.6s ease;
-}
-
-.final-rank-badge--reveal {
-  transform: scale(1);
-  opacity: 1;
-  box-shadow: 0 0 40px currentColor, 0 0 80px rgba(151, 117, 250, 0.3);
-}
-
-.final-rank-badge__icon {
-  font-size: 2.5rem;
-  line-height: 1;
-}
-
-.final-rank-badge__label {
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1;
-  margin-top: 4px;
-}
-
-.final-rank-badge__title {
-  font-size: 0.68rem;
-  color: rgba(255,255,255,0.6);
-  margin-top: 2px;
-  text-align: center;
-}
-
-.final-rank-score {
-  font-size: 0.95rem;
-  color: rgba(255,255,255,0.6);
-}
-
-.final-rank-score span {
-  font-weight: 700;
-  color: #9775FA;
-  font-size: 1.1rem;
-}
-
-/* 成績グリッド */
-.final-stats-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.final-stat-card {
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
-  padding: 14px 10px;
-  border: 1px solid rgba(255,255,255,0.07);
-}
-
-.final-stat-card__label {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 6px;
-  letter-spacing: 0.5px;
-}
-
-.final-stat-card__value {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #FFFFFF;
-}
-
-.final-stat-card__unit {
-  font-size: 0.72rem;
-  color: rgba(255,255,255,0.5);
-  margin-left: 2px;
-}
-
-/* レベルカード */
-.final-level-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(151, 117, 250, 0.1);
-  border: 1px solid rgba(151, 117, 250, 0.25);
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-.final-level-icon {
-  font-size: 1.8rem;
-  flex-shrink: 0;
-}
-
-.final-level-name {
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.final-level-lv {
-  font-size: 0.78rem;
-  color: rgba(255,255,255,0.5);
-  margin-top: 2px;
-}
-
-/* 成長グラフ */
-.final-chart-section {
-  margin-bottom: 28px;
-}
-
-.final-chart-title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 10px;
-  text-align: left;
-}
-
-.final-chart-wrap {
-  border-radius: 10px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.07);
-  height: 140px;
-}
-
-.final-chart-wrap canvas {
-  display: block;
-  width: 100%;
-  height: 140px;
-}
-
-/* LINE セクション */
-.final-line-section {
-  background: linear-gradient(135deg, rgba(6,200,75,0.12), rgba(6,200,75,0.06));
-  border: 1px solid rgba(6, 200, 75, 0.25);
-  border-radius: 16px;
-  padding: 20px 18px;
-  margin-bottom: 20px;
-}
-
-.final-line-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #FFFFFF;
-  margin-bottom: 6px;
-}
-
-.final-line-subtitle {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.65);
-  margin-bottom: 14px;
-  line-height: 1.5;
-}
-
-.final-benefits {
-  margin-bottom: 14px;
-}
-
-.final-benefit {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.8);
-  padding: 5px 0;
-  line-height: 1.4;
-  text-align: left;
-}
-
-.final-line-qr-wrap {
-  margin-bottom: 14px;
-}
-
-.final-line-qr {
-  width: 120px;
-  height: 120px;
-  border-radius: 8px;
-  border: 2px solid rgba(255,255,255,0.15);
-  display: block;
-  margin: 0 auto;
-}
-
-.final-line-qr-fallback {
-  width: 120px;
-  height: 80px;
-  border-radius: 8px;
-  border: 1px dashed rgba(255,255,255,0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  padding: 8px;
-}
-
-/* LINE ボタン */
-.btn--line {
-  background: #06C84B;
-  color: #FFFFFF;
-  font-weight: 700;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 14px;
-  border-radius: 12px;
-  font-size: 1rem;
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.btn--line:hover { background: #05A83E; }
-.btn--line:active { transform: scale(0.98); }
-
-.btn--line__icon {
-  font-size: 1.2rem;
-  font-weight: 900;
-  font-style: normal;
-}
-
-/* シェアセクション */
-.final-share-section {
-  margin-bottom: 20px;
-}
-
-.final-share-title {
-  font-size: 0.88rem;
-  color: rgba(255,255,255,0.5);
-  margin-bottom: 10px;
-  font-weight: 600;
-}
-
-.final-share-btns {
-  display: flex;
-  gap: 10px;
-}
-
-.btn--share-twitter {
-  flex: 1;
-  background: #000000;
-  color: #FFFFFF;
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 10px;
-  padding: 10px 8px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn--share-twitter:hover { background: #1a1a2e; }
-
-.btn--share-img {
-  flex: 1;
-  background: rgba(151, 117, 250, 0.15);
-  color: #9775FA;
-  border: 1px solid rgba(151, 117, 250, 0.35);
-  border-radius: 10px;
-  padding: 10px 8px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn--share-img:hover { background: rgba(151, 117, 250, 0.25); }
-
-/* ホームに戻る */
-.final-replay-section {
-  margin-top: 24px;
-}
-
-/* ==========================================================================
-   4. ホーム画面 — Day 達成バナー(Day 完了時に表示)
-   ========================================================================== */
-
-.day-clear-banner {
-  background: linear-gradient(135deg, rgba(151, 117, 250, 0.15), rgba(59, 130, 246, 0.1));
-  border: 1px solid rgba(151, 117, 250, 0.3);
-  border-radius: 12px;
-  padding: 12px 16px;
-  margin: var(--sp-4) 0;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.day-clear-banner__icon { font-size: 1.6rem; }
-
-.day-clear-banner__text {
-  flex: 1;
-}
-
-.day-clear-banner__title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.day-clear-banner__sub {
+.salon-feed__online {
   font-size: 0.78rem;
   color: var(--text-muted);
-  margin-top: 2px;
 }
 
+.salon-feed__online strong { color: #10B981; }
+
 /* ==========================================================================
-   5. ホーム画面 — マスターメッセージプレビューカード
+   5. LINE ソフトバナー(Day 6+)
    ========================================================================== */
 
-.master-msg-preview {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 215, 0, 0.07);
-  border: 1px solid rgba(255, 215, 0, 0.2);
+.line-soft-banner {
+  background: rgba(6, 199, 85, 0.07);
+  border: 1px solid rgba(6, 199, 85, 0.2);
   border-radius: 12px;
   padding: 12px 14px;
   margin: var(--sp-4) 0;
-  cursor: pointer;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.master-msg-preview:hover { background: rgba(255, 215, 0, 0.12); }
-
-.master-msg-preview__icon { font-size: 1.4rem; }
-
-.master-msg-preview__text { flex: 1; }
-
-.master-msg-preview__title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #FFD700;
+.line-soft-banner__text {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  flex: 1;
+  line-height: 1.4;
 }
 
-.master-msg-preview__sub {
+.line-soft-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.line-soft-banner__link {
   font-size: 0.78rem;
-  color: rgba(255,255,255,0.5);
-  margin-top: 2px;
+  color: #06C755;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-.master-msg-preview__arrow {
-  color: rgba(255,215,0,0.5);
-  font-size: 1.1rem;
+.line-soft-banner__dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.3);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  min-width: 28px;
+  min-height: 28px;
+  line-height: 1;
 }
 
 /* ==========================================================================
-   6. 最終画面トリガーボタン(Day 7 完了時、ホーム画面)
+   6. Day 7 完了バナー(ホーム)
    ========================================================================== */
 
 .final-cta-banner {
@@ -651,7 +539,7 @@
 }
 
 .final-cta-banner__title {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 800;
   background: linear-gradient(135deg, #9775FA, #38BDF8);
   -webkit-background-clip: text;
@@ -661,29 +549,84 @@
 }
 
 .final-cta-banner__sub {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.55);
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.5);
   margin-bottom: 14px;
 }
 
 /* ==========================================================================
-   prefers-reduced-motion
+   7. マスターメッセージプレビュー(後方互換)
    ========================================================================== */
+
+.master-msg-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 215, 0, 0.07);
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: var(--sp-4) 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+@media (hover: hover) {
+  .master-msg-preview:hover { background: rgba(255, 215, 0, 0.12); }
+}
+
+.master-msg-preview__icon  { font-size: 1.4rem; }
+.master-msg-preview__text  { flex: 1; }
+
+.master-msg-preview__title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #FFD700;
+}
+
+.master-msg-preview__sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+
+.master-msg-preview__arrow {
+  color: rgba(255,215,0,0.5);
+  font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   8. 設定画面 LINE リンク
+   ========================================================================== */
+
+.settings-line-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(6,199,85,0.08);
+  border: 1px solid rgba(6,199,85,0.2);
+  border-radius: 10px;
+  color: #06C755;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+@media (hover: hover) {
+  .settings-line-link:hover { background: rgba(6,199,85,0.15); }
+}
+
+/* ==========================================================================
+   9. prefers-reduced-motion
+   ========================================================================== */
+
 @media (prefers-reduced-motion: reduce) {
-  .master-msg-card,
-  .final-rank-badge,
-  .feed-item {
-    transition: none !important;
-    animation: none !important;
-  }
-
-  .master-msg-overlay,
-  .final-screen-overlay {
-    transition: none !important;
-  }
-
-  .final-rank-badge {
-    transform: scale(1) !important;
-    opacity: 1 !important;
-  }
+  .hikari-card__unread-dot { animation: none; opacity: 1; }
+  .salon-feed__live        { animation: none; }
+  .salon-feed__item        { transition: none; }
+  .hikari-overlay__card    { transition: none; }
+  .hikari-overlay          { transition: none; }
 }
