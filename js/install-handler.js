@@ -185,9 +185,17 @@
     });
   }
 
-  /* ---- ボタン文言を更新 ---- */
+  /* ---- ボタン文言を更新(iOS / deferredPrompt 有無で分岐) ---- */
   function _updateButtonLabels(canAutoInstall) {
-    var label = canAutoInstall ? '📲 1タップでインストール' : '📲 ホーム画面に追加する';
+    var dd = global.DeviceDetect || {};
+    var label;
+    if (dd.isIOS && dd.isIOS()) {
+      label = '📲 ホーム画面への追加方法';
+    } else if (canAutoInstall) {
+      label = '📲 1タップでインストール';
+    } else {
+      label = '📲 ホーム画面に追加';
+    }
     document.querySelectorAll('[data-install-btn]').forEach(function (el) {
       el.textContent = label;
     });
@@ -298,7 +306,9 @@
     },
 
     _hideAllInstallUI: function () {
-      document.querySelectorAll('[data-install-ui], .install-banner, .install-section, #install-banner').forEach(function (el) {
+      document.querySelectorAll(
+        '[data-install-ui], .install-banner, .install-section, .home-install-section, .install-message-button, #install-banner'
+      ).forEach(function (el) {
         el.style.display = 'none';
       });
     },

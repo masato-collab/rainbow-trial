@@ -14,7 +14,7 @@
  *   - CACHE_NAME を変更すると古いキャッシュを activate で一掃
  * ========================================================================== */
 
-const CACHE_VERSION = 'v5.9.0-20260416-home-install-restore';
+const CACHE_VERSION = 'v5.9.1-20260416-install-handler-labels';
 const CACHE_NAME    = 'rainbow-trial-' + CACHE_VERSION;
 
 const PRECACHE_URLS = [
